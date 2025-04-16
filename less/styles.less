@@ -1,0 +1,62 @@
+@import "reset.less";
+
+@buttonBackground: #e0e0a0;
+@specialButtonBackground: darken(@buttonBackground,30%);
+
+.inputs(@bg : white) {
+  margin: 2px;
+  padding: 2px;
+  background-color: @bg;
+}
+.border(@colour: black) {
+  border: 1px solid @colour;
+}
+.noBorder() {
+  border-style: none;
+}
+
+#modes {
+  button {
+    background-color: @buttonBackground;
+    &.selected {
+      background-color: @specialButtonBackground;
+    }
+  }
+
+}
+
+#inputs {
+
+  table {
+    border-collapse: collapse;
+    .border();
+    td, th {
+      .border();
+      padding: 0 4px 0 4px;
+      text-align: center;
+      input, select {
+        display: block;
+        width: 100%;
+        .inputs();
+        .noBorder();
+      }
+      select {
+        .border();
+      }
+      button {
+        .inputs(@buttonBackground);
+        .border(gray);
+        border-radius: 4px;
+        &.all {
+          border-width: 2px;
+          border-color: black;
+          background-color: @specialButtonBackground;
+        }
+      }
+    }
+
+
+  }
+
+
+}
