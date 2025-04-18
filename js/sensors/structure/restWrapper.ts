@@ -1,6 +1,6 @@
 import {HTTPRequest, HTTPMethod} from "./rest";
 
-export { ASRESTApi };
+
 
 const baseURLS = ((obj) => Object.freeze(obj)) ({
     BASE : '/',
@@ -11,7 +11,11 @@ const baseURLS = ((obj) => Object.freeze(obj)) ({
 
 
 
-class ASRESTApi {
+export class ASRESTApi {
+    device: string;
+    name: string;
+    start: number;
+    url: string;
 
     constructor(
         device = 'http://127.0.0.1:8080',
@@ -23,10 +27,11 @@ class ASRESTApi {
         this.url = `${device}${baseURLS.BASE}`;
     }
 
-    #makeURL(base = baseURLS.BASE, parameters = {}) {
+    private makeURL(base = baseURLS.BASE, parameters = {}) {
         let root = `${this.device}${base}`;
         let pars = Object.keys(parameters).map(key => {
-            let value = arguments[key];
+            // @ts-ignore
+            let value= arguments[key];
             return [key, value.toString()];
         });
         if(pars.length===0) {
@@ -40,17 +45,17 @@ class ASRESTApi {
 
 
 
-    async #read(base= baseURLS.BASE) {
-        let u = this.#makeURL(base);
+    private async read(base= baseURLS.BASE) {
+        let u = this.makeURL(base);
         return await (new HTTPRequest().handle(u,HTTPMethod.GET));
     }
 
     async data() {
-        return await this.#read(baseURLS.DATA);
+        return await this.read(baseURLS.DATA);
     }
 
     async beacons() {
-        return await this.#read(baseURLS.BEACONS);
+        return await this.read(baseURLS.BEACONS);
     }
 
 

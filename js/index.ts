@@ -1,16 +1,16 @@
-import {ApplicationGUI} from './gui/applicationGUI.js';
+import {ApplicationGUI} from './gui/applicationGUI';
 
 
 function start() {
     let appGUI = new ApplicationGUI();
-    appGUI.load().then( _ => {
+    appGUI.load().then( () => {
         window.console.log('GUI loaded');
     });
 }
 
 
-window.onload = (_) => {
+window.onload = () => {
     window.console.log('Starting');
     start();
-    window.onload = (_) => {};
+    window.onload = () => {};
 };
