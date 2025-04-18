@@ -231,6 +231,22 @@ class DOM {
     }
 
     /**
+     *
+     * @param {string} klass
+     * @returns {boolean}
+     */
+    toggleClass(klass) {
+        let v = this.hasClass(klass);
+        if(v) {
+            this.removeClass(klass);
+        }
+        else {
+            this.addClass(klass);
+        }
+        return !v;
+    }
+
+    /**
      * @typedef {keyof HTMLElementEventMap} EventName
      * @typedef {HTMLElementEventMap[EventName]} EventType
      *
@@ -349,6 +365,7 @@ class DOMTable {
         this.headers=headers.map(h => h.toString());
         this.rows=rows;
         this.table = new DOM('table');
+        this.dataRows = [];
         if(klass!==null) { this.table.addClass(klass); }
     }
 
@@ -370,11 +387,38 @@ class DOMTable {
 
     render() {
         let h = this.makeRow('th',this.headers);
-        let r = this.rows.map((row,idx) => {
-            return this.makeRow('td', row).setAttr('index',idx);
+        this.dataRows = this.rows.map((row,idx) => {
+            return this.makeRow('td', row).setAttrs({
+                'index': idx
+            });
         });
-        this.table.empty().append(h).appendAll(r);
+        this.table.empty().append(h).appendAll(this.dataRows);
         return this.table;
+    }
+
+    /**
+     *
+     * @param {number} idx
+     * @returns {boolean}
+     */
+    toggleRow(idx) {
+        let row = this.dataRows[idx];
+        return row.toggleClass('active');
+    }
+
+    get activeRows() {
+        return this.dataRows.filter(row => row.hasClass('active'));
+    }
+
+    get activeIndices() {
+        return this.activeRows.map(row => parseInt(row.getAttr('index')));
+    }
+
+    resetRows() {
+        this.dataRows.forEach(r => r.removeClass('active'));
+    }
+    setRows() {
+        this.dataRows.forEach(r => r.addClass('active'));
     }
 
     get dom() { return this.table; }

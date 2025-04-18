@@ -13,6 +13,14 @@ class ApplicationGUI {
         this.beacons = new Beacons();
     }
 
+    /**
+     *
+     * @param {Event} event
+     */
+    callback(event) {
+        console.log(event);
+    }
+
 
 
 
@@ -23,8 +31,10 @@ class ApplicationGUI {
         let b = new BeaconTable();
         b.render(this.beacons);
 
-        let formatter = new RecordFormatter();
-        this.records.raw.forEach((row) => console.log(formatter.csv(row)));
+        document.addEventListener('beacon', this.callback);
+
+        // let formatter = new RecordFormatter();
+        // this.records.raw.forEach((row) => console.log(formatter.csv(row)));
 
     }
 

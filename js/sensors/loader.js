@@ -1,12 +1,13 @@
 import {ASRESTApi} from "./structure/restWrapper";
-import {Record} from "./records";
+import {Beacon, Record} from "./records";
 
 export { Beacons, Records };
 
 class Beacons {
 
     constructor() {
-        this.beacons=new Map();
+        this.beacons = [];
+        this._keys = [];
     }
 
     /**
@@ -16,18 +17,25 @@ class Beacons {
     async load() {
         let loader = new ASRESTApi();
         let json = await loader.beacons();
+        let m = new Map();
         Object.keys(json).forEach(key => {
             let k = key.toString();
             let v = json[key].toString();
-            this.beacons.set(k,v);
+            m.set(k,v);
         });
+        this._keys = Array.from(m.keys()).toSorted();
+        this.beacons = this._keys.map( k => new Beacon(m.get(k),k));
     }
     /**
      *
      * @returns {[string]}
      */
     get keys() {
-        return Array.from(this.beacons.keys());
+        return this._keys;
+    }
+
+    get length() {
+        return this.beacons.length;
     }
 
 
@@ -35,15 +43,21 @@ class Beacons {
     /**
      *
      * @param {string} mac
-     * @returns {string}
+     * @returns {Beacon}
      */
     get(mac) {
-        if(this.beacons.has(mac)) {
-            return this.beacons.get(mac);
-        }
-        else {
-            return mac;
-        }
+        let idx =  this.beacons.findIndex(b => b.mac === mac);
+        if(idx<0) { return mac; }
+        else { return this.beacons[idx]; }
+    }
+
+    /**
+     *
+     * @param {int} idx
+     * @returns {Beacon}
+     */
+    at(idx) {
+        return this.beacons[idx];
     }
 }
 

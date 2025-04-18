@@ -25,15 +25,33 @@
 
 }
 
+table {
+  border-collapse: collapse;
+  .border();
+  td, th {
+    .border();
+    padding: 0 4px 0 4px;
+    text-align: center;
+  }
+  td {
+    .inputs;
+  }
+}
+
+#beacons {
+  table {
+    tr.active td {
+      .inputs(red);
+    }
+  }
+}
+
+
+
 #inputs {
 
   table {
-    border-collapse: collapse;
-    .border();
     td, th {
-      .border();
-      padding: 0 4px 0 4px;
-      text-align: center;
       input, select {
         display: block;
         width: 100%;

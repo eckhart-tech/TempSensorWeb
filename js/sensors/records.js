@@ -1,4 +1,4 @@
-export { Record, RecordFormatter };
+export { Beacon, Record, RecordFormatter };
 
 class Valid {
 
@@ -116,4 +116,25 @@ class Record {
 
 
 
+}
+
+class Beacon {
+    /**
+     *
+     * @param {string} name
+     * @param {string} mac
+     */
+    constructor(name, mac) {
+        this._name=name;
+        this._mac=mac;
+    }
+
+    get name() { return this._name; }
+    get mac() { return this._mac; }
+
+    toString() {
+        return `${this._name} [${this._mac}]'`;
+    }
+
+    get array() { return [this._name, this._mac]; }
 }
