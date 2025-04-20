@@ -1,5 +1,5 @@
 import { Chart } from 'chart.js/auto';
-import { DOM} from '../dom';
+import { DOM} from '../dom/dom';
 import {GraphDataSet} from './graphData';
 
 

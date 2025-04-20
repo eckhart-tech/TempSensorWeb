@@ -1,4 +1,4 @@
-import {ApplicationGUI} from './gui/applicationGUI';
+import {ApplicationGUI} from './gui';
 
 
 function start() {

@@ -1,14 +1,18 @@
 import {ASRESTApi} from "./structure/restWrapper";
+import {BaseRecordSet} from "./bases";
 import {Beacon, Record} from "./records";
 
 
-export class Beacons {
+export class Beacons extends BaseRecordSet {
   beacons: Beacon[];
   private _keys: string[];
   constructor() {
-    this.beacons = [];
+      super();
+      this.beacons = [];
     this._keys = [];
   }
+
+  get items() { return this.beacons; }
 
   /**
    *
@@ -64,7 +68,7 @@ export class Beacons {
 
 
 
-export class Records {
+export class Records extends BaseRecordSet {
 
     data : Record[];
     beaconData : Map<string,Record[]>;
@@ -73,11 +77,14 @@ export class Records {
     constructor(
         days : number = 365.0
     ) {
+        super();
         this.data = [];
         this.beaconData = new Map();
         this.days=days;
         this.loaded = false;
     }
+
+    get items() { return this.data; }
 
     async load() {
         let loader = new ASRESTApi();

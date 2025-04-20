@@ -2,8 +2,8 @@
 
 
 
-import { Beacons, Records } from "../sensors/loader";
-import {BeaconEvent, BeaconTable} from './beaconList';
+import { Beacons, Records } from "../sensors";
+import {BeaconEvent, BeaconTable, RecordTable} from './lists';
 
 export class ApplicationGUI {
   private records: Records;
@@ -28,6 +28,9 @@ export class ApplicationGUI {
 
     let b = new BeaconTable();
     b.render(this.beacons);
+
+    let r = new RecordTable();
+    r.render(this.records);
 
     document.addEventListener("beacon-list", this.callback);
   }

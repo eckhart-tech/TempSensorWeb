@@ -80,6 +80,7 @@ export class DOM {
     return this;
   }
 
+
   unmap(): DOM {
     this.element.parentElement?.removeChild(this.element);
     return this;
@@ -312,125 +313,5 @@ export class DOM {
   fire(event: Event) {
     this.element.dispatchEvent(event);
   }
-}
-
-export class DOMHelper {
-  /**
-   *
-   * @param {string} message
-   * @param {string} name
-   * @returns {DOM}
-   * @constructor
-   */
-  static Button(message: string, name: string = ""): DOM {
-    return new DOM("button").text(message).setAttrs({
-      type: "button",
-      name: name,
-    });
-  }
-
-  /**
-   *
-   * @param {string[]} strings
-   * @param {boolean} multiple
-   * @constructor
-   */
-  static Select(strings: string[], multiple: boolean = false) {
-    let dom = new DOM("select", {
-      multiple: multiple,
-    });
-    strings.forEach((s) => {
-      let o = new DOM("option", {
-        text: s,
-      });
-      dom.append(o);
-    });
-    return dom;
-  }
-}
-
-
-export class DOMTable {
-  /**
-   *
-   * @param {[string]} headers
-   * @param {[[string]]} rows
-   * @param klass
-   */
-
-  headers : string[];
-  rows : string[][];
-  table : DOM;
-  dataRows : DOM[];
-
-  constructor(
-    headers: string[] = [],
-    rows: string[][] = [],
-    klass: string = null,
-  ) {
-    this.headers = headers.map((h) => h.toString());
-    this.rows = rows;
-    this.table = new DOM("table");
-    this.dataRows = [];
-    if (klass !== null) {
-      this.table.addClass(klass);
-    }
-  }
-
-  reload(rows: string[][] = []) {
-    this.rows = rows;
-    this.render();
-  }
-
-  /**
-   *
-   * @param {string} tag
-   * @param {[string]} values
-   * @returns {DOM}
-   */
-  makeRow(tag: string, values: string[]): DOM {
-    return new DOM("tr").appendAll(values.map((v) => new DOM(tag).text(v)));
-  }
-
-  render(): DOM {
-    let h = this.makeRow("th", this.headers);
-    this.dataRows = this.rows.map((row, idx) => {
-      return this.makeRow("td", row).setAttrs({
-        index: idx,
-      });
-    });
-    this.table.empty().append(h).appendAll(this.dataRows);
-    return this.table;
-  }
-
-  /**
-   *
-   * @param {number} idx
-   * @returns {boolean}
-   */
-  toggleRow(idx: number): boolean {
-    let row = this.dataRows[idx];
-    return row.toggleClass("active");
-  }
-
-  get activeRows(): DOM[] {
-    return this.dataRows.filter((row) => row.hasClass("active"));
-  }
-
-  get activeIndices(): number[] {
-    return this.activeRows.map((row) => parseInt(row.getAttr("index")));
-  }
-
-  resetRows() {
-    this.dataRows.forEach((r) => r.removeClass("active"));
-  }
-  setRows() {
-    this.dataRows.forEach((r) => r.addClass("active"));
-  }
-
-  get dom(): DOM {
-    return this.table;
-  }
-
 }
 

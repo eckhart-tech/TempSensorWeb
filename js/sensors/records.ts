@@ -1,4 +1,6 @@
 
+import {BaseRecord} from './bases';
+
 
 class Valid {
 
@@ -42,7 +44,7 @@ class Valid {
 
 
 
-export class Record {
+export class Record extends BaseRecord {
 
     valid : boolean;
     mac : string;
@@ -56,7 +58,8 @@ export class Record {
    constructor(
        x = {}
     ) {
-        this.valid = true;
+       super();
+       this.valid = true;
         try {
             // @ts-ignore
             this.mac = Valid.asString(x.mac);
@@ -84,13 +87,20 @@ export class Record {
         return this.timestamp.valueOf();
     }
 
+    toString() : string { return ''; }
+
+    get array(): string[] {
+        return [this.sensor, this.mac, this.timestamp.toString(),
+        this.temperature.toString(), this.humidity.toString(), this.battery.toString()];
+    }
+
 
 
 
 
 }
 
-export class Beacon {
+export class Beacon extends BaseRecord {
   /**
    *
    * @param {string} name
@@ -99,7 +109,8 @@ export class Beacon {
    readonly name: string;
    readonly mac : string;
   constructor(name: string, mac: string) {
-    this.name = name;
+      super();
+      this.name = name;
     this.mac = mac;
   }
 
