@@ -1,5 +1,5 @@
 import {ASRESTApi} from "./structure/restWrapper";
-import {BaseRecordSet} from "./bases";
+import {BaseRecord, BaseRecordSet} from "./bases";
 import {Beacon, Record} from "./records";
 
 
@@ -7,12 +7,14 @@ export class Beacons extends BaseRecordSet {
   beacons: Beacon[];
   private _keys: string[];
   constructor() {
-      super();
-      this.beacons = [];
+    super();
+    this.beacons = [];
     this._keys = [];
   }
 
-  get items() { return this.beacons; }
+  get items() {
+    return this.beacons;
+  }
 
   /**
    *
@@ -38,9 +40,7 @@ export class Beacons extends BaseRecordSet {
     return this._keys;
   }
 
-  get length(): number {
-    return this.beacons.length;
-  }
+
 
   /**
    *
@@ -63,6 +63,10 @@ export class Beacons extends BaseRecordSet {
    */
   at(idx: number): Beacon {
     return this.beacons[idx];
+  }
+
+  filter(key: string): BaseRecord[] {
+    return [];
   }
 }
 
@@ -104,19 +108,18 @@ export class Records extends BaseRecordSet {
         this.loaded = true;
     }
 
-    get list(): string[] {
+    get keys(): string[] {
         return Array.from(this.beaconData.keys());
     }
 
-    recordsForBeacon(beacon: string): Record[] {
-        if(this.beaconData.has(beacon)) {
-            return this.beaconData.get(beacon);
+    filter(key: string): Record[] {
+        if(this.beaconData.has(key)) {
+            return this.beaconData.get(key);
         }
         else {
             return [];
         }
     }
 
-    get raw(): Record[] { return this.data; }
 }
 

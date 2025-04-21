@@ -22,7 +22,7 @@ class BeaconData {
      */
     constructor(beacon,records) {
         this.beacon=beacon;
-        this.records=records.recordsForBeacon(beacon);
+        this.records=records.filter(beacon);
         this.bounds = new Bounds(this.records.map(r => r.timestamp));
     }
 
@@ -47,7 +47,7 @@ class GraphDataSet {
      * @param {[string]|null} beacons
      */
     constructor(records, beacons=null) {
-        this.beacons = (beacons===null) ? records.list : beacons;
+        this.beacons = (beacons===null) ? records.keys : beacons;
         this.records = this.beacons.map(beacon => new BeaconData(beacon,records));
         this.bounds = Bounds.join(...this.records.map(recs => recs.bounds));
     }
