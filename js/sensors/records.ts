@@ -90,8 +90,8 @@ export class Record extends BaseRecord {
     toString() : string { return ''; }
 
     get array(): string[] {
-        return [this.sensor, this.mac, this.timestamp.toString(),
-        this.temperature.toString(), this.humidity.toString(), this.battery.toString()];
+        return [this.sensor, this.mac, this.timestamp.toLocaleString(),
+        this.temperature.toFixed(2), this.humidity.toFixed(2), this.battery.toFixed(2)];
     }
 
 

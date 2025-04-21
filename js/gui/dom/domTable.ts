@@ -1,132 +1,134 @@
 import {DOM} from "./dom";
-import {DOMHelper} from "./helper";
+import {DOMElement, DOMButton} from "./helper";
 import {PaginatorEvent} from "../lists/events";
 
-class Paginator {
-    readonly total : number;
-    readonly pageSize : number;
-    readonly nPages : number;
+class Paginator extends DOMElement {
+    total : number;
+    pageSize : number;
+    nPages : number;
     page: number;
-    base : DOM;
+    readonly event = 'paginator';
 
 
-    constructor(total : number, pageSize : number = 10) {
+    constructor(resettable : boolean = true) {
+        super('nav',{});
+        this.total = 1;
+        this.pageSize = 1;
+        this.page = 0;
+        this.nPages = 1;
+
+        this.dom.append(new DOMButton('up').addListener(this.up));
+        if(resettable) {
+            this.dom.append(new DOMButton('reset').addListener(this.reset));
+        }
+        this.dom.append(new DOMButton('down').addListener(this.down));
+    }
+
+    load(total : number, pageSize : 100, zero: boolean = true) {
         this.total = total;
         this.pageSize = pageSize;
         this.nPages = Math.ceil(this.total / this.pageSize);
-        this.base = new DOM('nav');
-        this.page = 0;
+        this.page = (zero) ? 0 : Math.min(this.page,this.nPages-1);
+        this.fire();
     }
 
     get first() { return this.page*this.pageSize; }
     get last() { return Math.min(this.first+this.pageSize, this.total); }
 
-    up() {
+    up(_ : Event) {
         this.page = Math.min(this.page+1,this.nPages-1);
+        this.fire();
     }
-    down() {
+    down(_ : Event) {
         this.page = Math.max(this.page-1,0);
     }
 
-    reset() {
+    reset(_ : Event) {
         this.page=0;
+        this.fire();
     }
 
     fire() {
-        this.base.fire(new PaginatorEvent(this.first,this.last));
+        let first = this.page*this.pageSize;
+        let last = Math.min(this.first+this.pageSize, this.total);
+        this.dom.fire(new PaginatorEvent(this.first,this.last));
     }
 
 
-
-
-
-
-    callback(event: Event) {
-        let dir = new DOM(event.target as Element).getAttr("button");
-        if (dir==='up') { this.up(); }
-        else if (dir==='down') { this.down(); }
-        this.fire();
-
-    }
-
-    render(table : DOMTable) {
-        let u = DOMHelper.Button('Next','up');
-        let d = DOMHelper.Button('Previous','down');
-        this.base.append(u).append(d).addEventListener('click',this.callback);
-        table.paginate(this);
-        return this.base;
-    }
 
 }
 
-export class DOMTable {
-    /**
-     *
-     * @param {[string]} headers
-     * @param {[[string]]} rows
-     * @param klass
-     */
+export class DOMTable extends DOMElement {
+  /**
+   *
+   * @param {[string]} headers
+   * @param {[[string]]} rows
+   * @param klass
+   */
 
-    headers : string[];
-    rows : string[][];
-    header : DOM;
-    table : DOM;
-    dataRows : DOM[];
-    range : number[]
 
-    constructor(
-        headers: string[] = [],
-        rows: string[][] = [],
-        klass: string = null
-    ) {
-        this.headers = headers.map((h) => h.toString());
-        this.rows = rows;
-        this.table = new DOM("table");
-        this.header= this.makeRow("th", this.headers);
-        this.dataRows = [];
-        if (klass !== null) {
-            this.table.addClass(klass);
-        }
-        this.range = this.rows.map((_,idx) => idx);
+  readonly rows: string[][];
+  body: DOM;
+  dataRows: DOM[];
+  readonly event : string = "click";
 
+  constructor(
+    headers: string[] = [],
+    rows: string[][] = [],
+    klass: string = null,
+  ) {
+    super("table");
+    this.body = new DOM("tbody");
+    this.dom
+      .append(new DOM("thead").append(this.makeRow("th",headers)))
+      .append(this.body);
+    if (klass !== null) {
+      this.dom.addClass(klass);
     }
+    this.rows = rows;
+    this.dataRows = [];
+  }
 
-    paginate(paginator : Paginator) {
-        this.table.addEventListener('paginator',this.rangeCallback);
-        paginator.fire();
-    }
+  get length() {
+    return this.rows.length;
+  }
 
-    reload(rows: string[][] = []) {
-        this.rows = rows;
-        this.range = this.rows.map((_,idx) => idx);
-        this.render();
-    }
+  /**
+   *
+   * @param {string} tag
+   * @param {[string]} values
+   * @returns {DOM}
+   */
+  private makeRow(tag: string, values: string[]): DOM {
+    return new DOM("tr").appendAll(values.map((v) => new DOM(tag).text(v)));
+  }
 
-    /**
-     *
-     * @param {string} tag
-     * @param {[string]} values
-     * @returns {DOM}
-     */
-    makeRow(tag: string, values: string[]): DOM {
-        return new DOM("tr").appendAll(values.map((v) => new DOM(tag).text(v)));
-    }
+  load(first: number = 0, last: number = Number.POSITIVE_INFINITY) {
+    let range = this.rows.filter((_, idx) => idx >= first && idx < last);
+    this.dataRows = range.map((row, idx) => {
+      return this.makeRow("td", row).setAttrs({index: idx});
+    });
+    this.body.empty().appendAll(this.dataRows);
+  }
 
-    rangeCallback(e : PaginatorEvent) {
-        this.range = e.range;
-        this.render();
-    }
+  addListener(
+      listener: EventListenerOrEventListenerObject,
+      options: AddEventListenerOptions = null,
+  ) {
+    this.body.addEventListener("click",listener,options);
+    return this.dom;
+  }
 
-    render(): DOM {
-        this.dataRows = this.range.map(idx => {
-            return this.makeRow("td",this.rows[idx]).setAttrs({
-                index: idx,
-            });
-        });
-        this.table.empty().append(this.header).appendAll(this.dataRows);
-        return this.table;
-    }
+}
 
+type Constructible = new (...args : any[]) => {};
+function Make<T extends Constructible>(Base : T) {
+    return class S extends Base {};
+}
+
+
+
+export class SelectableDOMTable extends DOMTable {
     /**
      *
      * @param {number} idx
@@ -151,10 +153,5 @@ export class DOMTable {
     setRows() {
         this.dataRows.forEach((r) => r.addClass("active"));
     }
-
-    get dom(): DOM {
-        return this.table;
-    }
-
 }
 

@@ -1,37 +1,48 @@
 import {DOM} from "./dom";
 
-export class DOMHelper {
-    /**
-     *
-     * @param {string} message
-     * @param {string} name
-     * @returns {DOM}
-     * @constructor
-     */
-    static Button(message: string, name: string = ""): DOM {
-        return new DOM("button").text(message).setAttrs({
-            type: "button",
-            name: name,
-        });
+
+
+export abstract class DOMElement {
+    readonly dom: DOM;
+    readonly event : string;
+
+    protected constructor(tag: string, args = {}) {
+        this.dom = new DOM(tag, args);
     }
 
-    /**
-     *
-     * @param {string[]} strings
-     * @param {boolean} multiple
-     * @constructor
-     */
-    static Select(strings: string[], multiple: boolean = false) {
-        let dom = new DOM("select", {
-            multiple: multiple,
-        });
+    addListener(listener: EventListenerOrEventListenerObject,
+                options: AddEventListenerOptions = null) {
+        this.dom.addEventListener(this.event, listener, options);
+        return this.dom;
+    }
+}
+
+
+
+export class DOMButton extends DOMElement {
+  readonly event: string = "click";
+
+  constructor(message: string, name: string = "") {
+    super("button");
+    this.dom.text(message).setAttr("button", name);
+    this.event = "click";
+  }
+
+  click() {
+    this.dom.click();
+  }
+
+}
+
+export class DOMSelect extends DOMElement {
+    readonly event : string = "change";
+
+    constructor(strings: string[], multiple: boolean = false) {
+        super("select", {multiple: multiple});
         strings.forEach((s) => {
-            let o = new DOM("option", {
-                text: s,
-            });
-            dom.append(o);
+            let o = new DOM("option", {text: s});
+            this.dom.append(o);
         });
-        return dom;
     }
 }
 

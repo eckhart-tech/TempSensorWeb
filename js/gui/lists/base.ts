@@ -1,13 +1,13 @@
-import {DOM, DOMTable} from "../dom/dom";
+import {DOM, DOMTable} from "../dom";
 import {BaseRecord, BaseRecordSet} from "../../sensors";
 
 
 
-export abstract class Table {
+export abstract class Table<TAB extends DOMTable> {
     tag : string;
     base : DOM;
     rows : BaseRecord[];
-    table: DOMTable;
+    table: TAB;
 
     abstract Headers :string[];
     abstract Klass : string;
@@ -24,6 +24,8 @@ export abstract class Table {
         return x;
     }
 
+
+
     static eventTargetParent(e: MouseEvent): Element {
         let target = Table.check(e.target as Element);
         let tag = Table.check(target.tagName).toUpperCase();
@@ -37,7 +39,7 @@ export abstract class Table {
         }
     }
 
-    constructor(tag: string) {
+    protected constructor(tag: string) {
         this.tag = tag;
         this.base = DOM.withID(this.tag);
         this.rows = [];
@@ -45,14 +47,14 @@ export abstract class Table {
     }
 
     abstract callback(event: MouseEvent) : void;
+    abstract getNew(...args: any[]) : TAB;
 
     render(data: BaseRecordSet): void {
         this.rows = data.items;
         let trs = this.rows.map((b) => b.array);
-        this.table = new DOMTable(this.Headers, trs, this.Klass);
-        let t = this.table
-            .render()
-            .addEventListener("click", (ev) => this.callback(ev as MouseEvent));
-        this.base.empty().append(t);
+        this.table = this.getNew(this.Headers, trs, this.Klass);
+        this.table.load()
+        this.table.addListener((ev) => this.callback(ev as MouseEvent));
+        this.base.empty().append(this.table.dom);
     }
 }

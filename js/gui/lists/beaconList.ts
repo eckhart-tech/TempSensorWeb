@@ -1,14 +1,14 @@
-import {DOM, DOMTable} from '../dom';
+import {DOM, SelectableDOMTable} from '../dom';
 import {Beacon} from '../../sensors';
 import {Table} from './base';
 import {BeaconEvent} from "./events";
 
 
-export class BeaconTable extends Table {
+export class BeaconTable extends Table<SelectableDOMTable> {
   tag: string;
   base: DOM;
   rows: Beacon[];
-  table: DOMTable;
+  table: SelectableDOMTable;
 
   Headers = ["Name", "MAC"];
   Klass = "bcn";
@@ -17,6 +17,9 @@ export class BeaconTable extends Table {
     super(tag);
   }
 
+  getNew(...args: any[]): SelectableDOMTable {
+    return new SelectableDOMTable(...args);
+  }
 
   /**
    *
@@ -36,6 +39,4 @@ export class BeaconTable extends Table {
       console.error(`Bad click : ${e.toString()}`);
     }
   }
-
-
 }
