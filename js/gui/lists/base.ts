@@ -57,4 +57,6 @@ export abstract class Table<TAB extends DOMTable> {
         this.table.addListener((ev) => this.callback(ev as MouseEvent));
         this.base.empty().append(this.table.dom);
     }
+
+    get tableRows() : DOM[] { return this.table.dataRows; }
 }

@@ -11,6 +11,7 @@ export class RecordTable extends Table<DOMTable> {
     rows: Record[];
     table: DOMTable;
 
+
     Headers = ["Name", "MAC", "Time", "Temperature (C)", "Humidity (%)", "Battery (%)"];
     Klass = "rec";
 
@@ -32,5 +33,22 @@ export class RecordTable extends Table<DOMTable> {
         } catch (e) {
             console.error(`Bad click : ${e.toString()}`);
         }
+    }
+
+    reset() {
+      this.tableRows.forEach(row => row.removeClass('hide'));
+    }
+
+    filter(names : string[]=[]) {
+      console.log('Filtering with', names);
+      if(names.length===0) { this.reset(); }
+      else {
+        let filters = new Set(names);
+        this.tableRows.forEach((row, idx) => {
+          let check = filters.has(this.rows[idx].sensor);
+          (check) ? row.removeClass('hide') : row.addClass('hide');
+        });
+
+      }
     }
 }
