@@ -8,14 +8,15 @@ import {BeaconEvent, BeaconTable, RecordTable} from './lists';
 export class ApplicationGUI {
   private records: Records;
   private beacons: Beacons;
-  private beaconTable : BeaconTable;
-  private recordTable : RecordTable;
+  private beaconNames : Set<string>;
+  private beaconTable : BeaconTable | null;
+  private recordTable : RecordTable | null;
 
   constructor() {
     this.records = new Records();
     this.beacons = new Beacons();
-    this.beaconTable = new BeaconTable();
-    this.recordTable = new RecordTable();
+    this.beaconNames = new Set();
+
 
   }
 
@@ -25,20 +26,24 @@ export class ApplicationGUI {
    */
   callback(event: BeaconEvent) {
     console.log(event);
-    let filter = event.active.map(beacon => beacon.name);
-    console.log('Filter is', filter, 'Table is', this.recordTable);
+    console.log('Payload is', event, 'Table is', this.recordTable);
 
-    this.recordTable.filter(filter);
+    this.recordTable?.filter(event.activeBeacons);
   }
 
   async load() {
     await this.beacons.load();
     await this.records.load();
 
+    this.beaconNames = new Set(this.beacons.beacons.map(b => b.name));
+    this.beaconTable = new BeaconTable();
+    this.recordTable = new RecordTable(this.beaconNames);
 
     this.beaconTable.render(this.beacons);
     this.recordTable.render(this.records);
 
+
     document.addEventListener("beacon-list", e => this.callback(e));
+    this.callback(new BeaconEvent());
   }
 }

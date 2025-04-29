@@ -3,15 +3,22 @@ import {Beacon} from "../../sensors";
 /**
  * @extends Event
  */
-export class BeaconEvent extends Event {
-    /**
-     *  @param {Beacon[]} beacons
-     */
-    readonly active : Beacon[];
 
-    constructor(beacons : Beacon[] = []) {
+export interface BeaconEventData {
+  active: string[];
+  isAll : boolean;
+}
+
+export class BeaconEvent extends Event {
+    readonly activeBeacons: Set<string>;
+
+    constructor(active: Beacon[] = []) {
         super('beacon-list', {bubbles: true});
-        this.active = beacons;
+        this.activeBeacons = new Set(active.map(b => b.name));
+    }
+
+    get displayAll() : boolean {
+      return this.activeBeacons.size===0;
     }
 }
 

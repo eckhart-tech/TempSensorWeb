@@ -62,6 +62,15 @@ table {
     td, th {
       .textFont(0.5em);
     }
+    tr {
+      &.hide {
+        visibility: hidden;
+      }
+      &.anomaly td {
+        font-style: italic;
+        color: red;
+      }
+    }
   }
 }
 
@@ -70,6 +79,14 @@ table {
 #inputs {
 
   table {
+    tr {
+      &.hide {
+        visibility: hidden;
+      }
+      &.anomaly {
+        border-color: red;
+      }
+    }
     td, th {
       input, select {
         display: block;
