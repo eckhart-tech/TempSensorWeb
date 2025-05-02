@@ -108,19 +108,22 @@ export class Beacon extends BaseRecord {
    */
    readonly name: string;
    readonly mac : string;
-  constructor(name: string, mac: string) {
+   readonly anomalous: boolean;
+
+  constructor(name: string, mac: string, anomalous:boolean = false) {
       super();
       this.name = name;
     this.mac = mac;
+    this.anomalous=anomalous;
   }
 
 
 
   toString() {
-    return `${this.name} [${this.mac}]'`;
+    return `${this.name} [${this.mac}] anomalous:${this.anomalous}'`;
   }
 
   get array() {
-    return [this.name, this.mac];
+    return [this.name, this.mac, this.anomalous ? 'anomaly' : ''];
   }
 }

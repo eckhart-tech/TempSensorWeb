@@ -2,6 +2,10 @@ import {DOM, DOMTable, SelectableDOMTable} from '../dom';
 import { BaseRecordSet, Beacon, Record } from "../../sensors";
 import {Table} from './base';
 import {BeaconEvent} from "./events";
+import { XSet } from "./XSet";
+
+
+
 
 
 export class RecordTable extends Table<DOMTable> {
@@ -9,8 +13,8 @@ export class RecordTable extends Table<DOMTable> {
   base: DOM;
   rows: Record[];
   table: DOMTable;
-  allBeacons: Set<string>;
-  knownBeacons: Set<string>;
+  allBeacons: XSet<string>;
+
 
   Headers = [
     "Name",
@@ -21,13 +25,12 @@ export class RecordTable extends Table<DOMTable> {
     "Battery (%)",
   ];
   Klass = "rec";
-  private anomalousBeacons: Set<string>;
 
-  constructor(knownBeacons: Set<string>, tag = "records") {
+
+  constructor(tag = "records") {
     super(tag);
-    this.allBeacons = new Set();
-    this.knownBeacons = knownBeacons;
-    this.anomalousBeacons = new Set();
+    //this.knownBeacons = knownBeacons;
+    //this.anomalousBeacons = new Set();
   }
 
   getNew(...args: any[]): DOMTable {
@@ -44,14 +47,7 @@ export class RecordTable extends Table<DOMTable> {
     }
   }
 
-  render(data: BaseRecordSet) {
-    super.render(data);
-    let beaconNames = this.rows.map((r) => r.sensor);
-    this.allBeacons = new Set(beaconNames);
-    this.anomalousBeacons = new Set(
-      beaconNames.filter((b) => !this.knownBeacons.has(b)),
-    );
-  }
+
 
 
 
@@ -69,7 +65,7 @@ export class RecordTable extends Table<DOMTable> {
 
     let displayAll = active.size === 0;
     let visible: number = 0;
-    let anomalous: number = this.tableRows.length;
+
     this.tableRows.forEach((row, idx) => {
       let b = this.rows[idx].sensor;
 
@@ -78,14 +74,9 @@ export class RecordTable extends Table<DOMTable> {
         "hide",
         displayAll || active.has(b),
       );
-      anomalous -= RecordTable.selectClass(
-        row,
-        "anomaly",
-        !this.anomalousBeacons.has(b),
-      );
     });
     console.log(
-      `Loaded ${this.tableRows.length} rows; ${visible} visible, ${anomalous} anomalous`,
+      `Loaded ${this.tableRows.length} rows; ${visible} visible`,
     );
   }
 }

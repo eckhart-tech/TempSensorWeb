@@ -2,20 +2,48 @@
 
 
 
-import { Beacons, Records } from "../sensors";
+import { BaseRecord, BaseRecordSet, Beacon, Beacons, Records } from "../sensors";
 import {BeaconEvent, BeaconTable, RecordTable} from './lists';
+import { XSet } from "./lists/XSet";
+
+
+class XBeacons extends BaseRecordSet {
+  allBeacons: Beacon[];
+
+  constructor(beacons: Beacons, records: Records) {
+    super();
+    let standard = new XSet(beacons.items.map((b) => b.name));
+    let present = new XSet(records.items.map((r) => r.sensor));
+    let anomalous = present.difference(standard);
+    let anomalousBeacons = [...anomalous].map((n) => new Beacon(n, "", true));
+
+    this.allBeacons = beacons.items.concat(anomalousBeacons);
+  }
+
+  get items() {
+    return this.allBeacons;
+  }
+
+  get keys(): string[] {
+    return this.allBeacons.map((b) => b.name).toSorted();
+  }
+
+  filter(key: string): BaseRecord[] {
+    return [];
+  }
+}
+
 
 export class ApplicationGUI {
   private records: Records;
-  private beacons: Beacons;
-  private beaconNames : Set<string>;
+  private beacons: XBeacons | null;
   private beaconTable : BeaconTable | null;
   private recordTable : RecordTable | null;
 
   constructor() {
     this.records = new Records();
-    this.beacons = new Beacons();
-    this.beaconNames = new Set();
+    this.beacons = null;
+
 
 
   }
@@ -32,12 +60,13 @@ export class ApplicationGUI {
   }
 
   async load() {
-    await this.beacons.load();
+    let beacons = new Beacons();
+    await beacons.load();
     await this.records.load();
+    this.beacons = new XBeacons(beacons,this.records);
 
-    this.beaconNames = new Set(this.beacons.beacons.map(b => b.name));
     this.beaconTable = new BeaconTable();
-    this.recordTable = new RecordTable(this.beaconNames);
+    this.recordTable = new RecordTable();
 
     this.beaconTable.render(this.beacons);
     this.recordTable.render(this.records);

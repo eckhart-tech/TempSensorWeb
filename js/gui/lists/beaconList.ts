@@ -10,7 +10,7 @@ export class BeaconTable extends Table<SelectableDOMTable> {
   rows: Beacon[];
   table: SelectableDOMTable;
 
-  Headers = ["Name", "MAC"];
+  Headers = ["Name", "MAC", "Anomalous"];
   Klass = "bcn";
 
   constructor(tag = "beacons") {
