@@ -1,3 +1,2 @@
 export { DOM } from './dom' ;
-export { DOMTable, SelectableDOMTable } from './domTable';
-export { DOMButton, DOMElement } from './helper';
+export { DOMTable, SelectableDOMTable, DOMButton, DOMElement } from './elements';

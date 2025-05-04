@@ -1,8 +1,7 @@
-import {DOM, DOMTable, SelectableDOMTable} from '../dom';
-import { BaseRecordSet, Beacon, Record } from "../../sensors";
+import {DOM, DOMTable} from '../dom';
+import { Record } from "../../sensors";
 import {Table} from './base';
-import {BeaconEvent} from "./events";
-import { XSet } from "./XSet";
+import { ESSet } from "../../lib/XSet";
 
 
 
@@ -13,7 +12,7 @@ export class RecordTable extends Table<DOMTable> {
   base: DOM;
   rows: Record[];
   table: DOMTable;
-  allBeacons: XSet<string>;
+  allBeacons: ESSet<string>;
 
 
   Headers = [
@@ -24,11 +23,11 @@ export class RecordTable extends Table<DOMTable> {
     "Humidity (%)",
     "Battery (%)",
   ];
-  Klass = "rec";
 
 
-  constructor(tag = "records") {
-    super(tag);
+
+  constructor(tag = "records",klass : string = "rec", title : string | null = null) {
+    super(tag,klass,title);
     //this.knownBeacons = knownBeacons;
     //this.anomalousBeacons = new Set();
   }

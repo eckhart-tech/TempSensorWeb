@@ -3,6 +3,8 @@ import {BaseRecord, BaseRecordSet} from "./bases";
 import {Beacon, Record} from "./records";
 
 
+
+
 export class Beacons extends BaseRecordSet {
   beacons: Beacon[];
   private _keys: string[];

@@ -1,11 +1,12 @@
 import { Chart } from 'chart.js/auto';
 import { DOM} from '../dom/dom';
-import {GraphDataSet} from './graphData';
+import {GraphDataSet, Parameter} from './graphData';
 
 
 
 
 class ChartConfiguration {
+  private formatter: Intl.DateTimeFormat;
     /**
      *
      * @param {string} locale
@@ -22,7 +23,7 @@ class ChartConfiguration {
      * @param {string} parameter
      * @returns {{type: string, data: {datasets}, options: {animation: boolean}, plugins: {legends: {display: boolean}, title: {display: boolean, text: string}}, scales: {x: {min, max, ticks: {callback: (function(*): string)}}, y: {min: number, max: number, ticks: {callback: (function(*): string)}}}}}
      */
-    config(data,parameter) {
+    config(data: GraphDataSet ,parameter:Parameter) {
         let datasets = data.dataSet(parameter);
         let unit = GraphDataSet.unit(parameter);
         let beacons = data.beacons.join(', ');
@@ -50,14 +51,14 @@ class ChartConfiguration {
                     min: data.bounds.min,
                     max: data.bounds.max,
                     ticks: {
-                        callback: value => this.formatter.format(value)
+                        callback: (value: Date | number)  => this.formatter.format(value)
                     }
                 },
                 y: {
                     min: 0.0,
                     max: 100.0,
                     ticks: {
-                        callback: value => `${value}${unit}`
+                        callback: (value : number ) => `${value}${unit}`
                     }
                 }
             }
@@ -67,11 +68,13 @@ class ChartConfiguration {
 
 
 class Graphic {
+   configuration: ChartConfiguration;
+  element: DOM;
     /**
      *
      * @param {string} id
      */
-    constructor(id) {
+    constructor(id: string) {
         this.configuration = new ChartConfiguration();
         this.element = DOM.withID(id);
     }
@@ -86,11 +89,11 @@ class Graphic {
      * @param {string} parameter
      * @returns {Promise<void>}
      */
-    async draw(data,parameter) {
+    async draw(data: GraphDataSet,parameter: Parameter) {
         this.clean();
         let config = this.configuration.config(data,parameter);
         let canvas = new DOM('canvas').addClass(parameter);
-        new Chart(canvas, config);
+        new Chart(canvas.dom as HTMLCanvasElement, config);
         this.element.append(canvas);
     }
 }

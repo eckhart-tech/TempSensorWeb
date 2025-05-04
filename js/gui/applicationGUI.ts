@@ -4,28 +4,26 @@
 
 import { BaseRecord, BaseRecordSet, Beacon, Beacons, Records } from "../sensors";
 import {BeaconEvent, BeaconTable, RecordTable} from './lists';
-import { XSet } from "./lists/XSet";
 
 
-class XBeacons extends BaseRecordSet {
-  allBeacons: Beacon[];
 
-  constructor(beacons: Beacons, records: Records) {
+class ExtraBeacons extends BaseRecordSet {
+  extraBeacons : Beacon[];
+
+  constructor(records: Records, beacons: Beacons) {
     super();
-    let standard = new XSet(beacons.items.map((b) => b.name));
-    let present = new XSet(records.items.map((r) => r.sensor));
-    let anomalous = present.difference(standard);
-    let anomalousBeacons = [...anomalous].map((n) => new Beacon(n, "", true));
 
-    this.allBeacons = beacons.items.concat(anomalousBeacons);
+    let extraNames = records.names.difference(beacons.names);
+    this.extraBeacons = [...extraNames].map((n) => new Beacon(n, n));
   }
 
   get items() {
-    return this.allBeacons;
+    return this.extraBeacons;
   }
 
+
   get keys(): string[] {
-    return this.allBeacons.map((b) => b.name).toSorted();
+    return this.extraBeacons.map((b) => b.name).toSorted();
   }
 
   filter(key: string): BaseRecord[] {
@@ -36,13 +34,15 @@ class XBeacons extends BaseRecordSet {
 
 export class ApplicationGUI {
   private records: Records;
-  private beacons: XBeacons | null;
+  private beacons: Beacons;
+  private extraBeacons : ExtraBeacons | null;
   private beaconTable : BeaconTable | null;
+  private extraTable : BeaconTable | null;
   private recordTable : RecordTable | null;
 
   constructor() {
     this.records = new Records();
-    this.beacons = null;
+    this.beacons = new Beacons();
 
 
 
@@ -54,21 +54,27 @@ export class ApplicationGUI {
    */
   callback(event: BeaconEvent) {
     console.log(event);
-    console.log('Payload is', event, 'Table is', this.recordTable);
 
-    this.recordTable?.filter(event.activeBeacons);
+    let filter = new XSet(this.beaconTable.active.concat(this.extraTable.active).map(b => b.name));
+    console.log('Payload is', filter, 'Table is', this.recordTable);
+    this.recordTable?.filter(filter);
   }
 
   async load() {
-    let beacons = new Beacons();
-    await beacons.load();
     await this.records.load();
-    this.beacons = new XBeacons(beacons,this.records);
+    await this.beacons.load();
 
-    this.beaconTable = new BeaconTable();
+    this.extraBeacons = new ExtraBeacons(this.records,this.beacons);
+    console.log('Extra',this.extraBeacons);
+
+    this.beaconTable = new BeaconTable('Known beacons','bcn-known');
+    this.extraTable = new BeaconTable('Additional beacons','bcn-extra');
     this.recordTable = new RecordTable();
 
     this.beaconTable.render(this.beacons);
+    if(this.extraBeacons.length>0) {
+      this.extraTable.render(this.extraBeacons,false);
+    }
     this.recordTable.render(this.records);
 
 

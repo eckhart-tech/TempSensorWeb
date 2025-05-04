@@ -53,7 +53,8 @@ export class Record extends BaseRecord {
     time: string;
     temperature : number;
     humidity : number;
-    battery : number; 
+    battery : number;
+
     
    constructor(
        x = {}
@@ -79,7 +80,10 @@ export class Record extends BaseRecord {
             console.error(`Error : ${e.toString()}`);
             this.valid = false;
         }
+
     }
+
+    get name() : string { return this.sensor;    }
 
 
 
@@ -108,22 +112,20 @@ export class Beacon extends BaseRecord {
    */
    readonly name: string;
    readonly mac : string;
-   readonly anomalous: boolean;
 
-  constructor(name: string, mac: string, anomalous:boolean = false) {
+  constructor(name: string, mac: string) {
       super();
       this.name = name;
     this.mac = mac;
-    this.anomalous=anomalous;
   }
 
 
 
   toString() {
-    return `${this.name} [${this.mac}] anomalous:${this.anomalous}'`;
+    return `${this.name} [${this.mac}]'`;
   }
 
   get array() {
-    return [this.name, this.mac, this.anomalous ? 'anomaly' : ''];
+    return [this.name, this.mac];
   }
 }
