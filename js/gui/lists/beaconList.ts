@@ -9,7 +9,6 @@ export class BeaconTable extends Table<SelectableDOMTable> {
   base: DOM;
   rows: Beacon[];
   table: SelectableDOMTable;
-  active: Beacon[];
 
   Headers = ["Name", "MAC"];
 
@@ -33,11 +32,15 @@ export class BeaconTable extends Table<SelectableDOMTable> {
       let clicked = this.rows[index];
       console.log(`Clicked on row ${index} : ${clicked.toString()}`);
       this.table.toggleRow(index);
-      let ind = this.table.activeIndices;
-      this.active = ind.map((idx) => this.rows[idx]);
+
       this.table.dom.fire(new BeaconEvent(this.active));
     } catch (e) {
       console.error(`Bad click : ${e.toString()}`);
     }
+  }
+
+  get active() {
+    let ind = this.table.activeIndices;
+    return ind.map((idx) => this.rows[idx]);
   }
 }

@@ -1,5 +1,6 @@
 
-import {BaseRecord} from './bases';
+import { BaseRecord, BaseRecordSet } from "./bases";
+
 
 
 class Valid {
@@ -46,57 +47,104 @@ class Valid {
 
 export class Record extends BaseRecord {
 
-    valid : boolean;
-    mac : string;
-    sensor : string;
-    timestamp : Date;
-    time: string;
-    temperature : number;
-    humidity : number;
-    battery : number;
+  valid: boolean;
+  mac: string;
+  sensor: string;
+  timestamp: Date;
+  time: string;
+  temperature: number;
+  humidity: number;
+  battery: number;
 
-    
-   constructor(
-       x = {}
-    ) {
-       super();
-       this.valid = true;
-        try {
-            // @ts-ignore
-            this.mac = Valid.asString(x.mac);
-            // @ts-ignore
-            this.sensor = Valid.asString(x.sensor);
-            // @ts-ignore
-            this.timestamp = Valid.asDate(x.timestamp);
-            this.time = undefined;
-            // @ts-ignore
-            this.temperature = Valid.asNumber(x.temperature);
-            // @ts-ignore
-            this.humidity = Valid.asPercentage(x.humidity);
-            // @ts-ignore
-            this.battery = Valid.asPercentage(x.battery);
-        }
-        catch(e) {
-            console.error(`Error : ${e.toString()}`);
-            this.valid = false;
-        }
 
+  constructor(
+    x = {}
+  ) {
+    super();
+    this.valid = true;
+    try {
+      // @ts-ignore
+      this.mac = Valid.asString(x.mac);
+      // @ts-ignore
+      this.sensor = Valid.asString(x.sensor);
+      // @ts-ignore
+      this.timestamp = Valid.asDate(x.timestamp);
+      this.time = undefined;
+      // @ts-ignore
+      this.temperature = Valid.asNumber(x.temperature);
+      // @ts-ignore
+      this.humidity = Valid.asPercentage(x.humidity);
+      // @ts-ignore
+      this.battery = Valid.asPercentage(x.battery);
+    } catch (e) {
+      console.error(`Error : ${e.toString()}`);
+      this.valid = false;
     }
 
-    get name() : string { return this.sensor;    }
+  }
+
+  get name(): string {
+    return this.sensor;
+  }
+
+
+  ordinal() {
+    return this.timestamp.valueOf();
+  }
+
+  toString(): string {
+    return '';
+  }
+
+  get array(): string[] {
+    return [this.sensor, this.mac, this.timestamp.toLocaleString(),
+      this.temperature.toFixed(2), this.humidity.toFixed(2), this.battery.toFixed(2)];
+  }
+}
+
+  export class Records extends BaseRecordSet {
+
+  data : Record[];
+  beaconData : Map<string,Record[]>;
+  min: Date;
+  max: Date;
+  constructor(records: Record[] = []) {
+    super();
+    this.data = records;
+    let times = records.map(r => r.timestamp.getTime());
+    this.min = new Date(Math.min(...times));
+    this.max = new Date(Math.max(...times));
+
+    this.beaconData = new Map();
+
+    this.data.forEach(record => {
+      let sensor = record.sensor;
+      if (!this.beaconData.has(sensor)) {
+        this.beaconData.set(sensor,[]);
+      }
+      this.beaconData.get(sensor).push(record);
+    });
+  }
+
+  get items() { return this.data; }
 
 
 
-    ordinal() {
-        return this.timestamp.valueOf();
+  get keys(): string[] {
+    return Array.from(this.beaconData.keys());
+  }
+
+  filter(key: string): Record[] {
+    if(this.beaconData.has(key)) {
+      return this.beaconData.get(key);
     }
-
-    toString() : string { return ''; }
-
-    get array(): string[] {
-        return [this.sensor, this.mac, this.timestamp.toLocaleString(),
-        this.temperature.toFixed(2), this.humidity.toFixed(2), this.battery.toFixed(2)];
+    else {
+      return [];
     }
+  }
+
+
+
 
 
 
@@ -104,28 +152,3 @@ export class Record extends BaseRecord {
 
 }
 
-export class Beacon extends BaseRecord {
-  /**
-   *
-   * @param {string} name
-   * @param {string} mac
-   */
-   readonly name: string;
-   readonly mac : string;
-
-  constructor(name: string, mac: string) {
-      super();
-      this.name = name;
-    this.mac = mac;
-  }
-
-
-
-  toString() {
-    return `${this.name} [${this.mac}]'`;
-  }
-
-  get array() {
-    return [this.name, this.mac];
-  }
-}

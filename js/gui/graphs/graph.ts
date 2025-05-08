@@ -1,64 +1,48 @@
 import { Chart } from 'chart.js/auto';
-import { DOM} from '../dom/dom';
-import {GraphDataSet, Parameter} from './graphData';
+import { DOM} from '../dom';
+import { GraphDataSet, Parameter, ParameterInfo } from "./graphData";
+import { GraphicConfiguration } from "./configuration";
+
 
 
 
 
 class ChartConfiguration {
   private formatter: Intl.DateTimeFormat;
-    /**
-     *
-     * @param {string} locale
-     */
-    constructor(
-        locale = 'en-GB'
+  title: string | null;
+
+  constructor(
+        locale : string = 'en-GB'
     ) {
         this.formatter = new Intl.DateTimeFormat(locale);
+        this.title=null;
     }
 
-    /**
-     *
-     * @param {GraphDataSet} data
-     * @param {string} parameter
-     * @returns {{type: string, data: {datasets}, options: {animation: boolean}, plugins: {legends: {display: boolean}, title: {display: boolean, text: string}}, scales: {x: {min, max, ticks: {callback: (function(*): string)}}, y: {min: number, max: number, ticks: {callback: (function(*): string)}}}}}
-     */
-    config(data: GraphDataSet ,parameter:Parameter) {
+
+    config(data: GraphDataSet ,parameter:Parameter): GraphicConfiguration {
         let datasets = data.dataSet(parameter);
-        let unit = GraphDataSet.unit(parameter);
+        let info = new ParameterInfo(parameter);
         let beacons = data.beacons.join(', ');
-        let title = `${parameter} for ${beacons} (${unit})`;
+        this.title = `${parameter} for ${beacons} (${info.units})`;
 
         return {
             type: 'scatter',
-            data: {
-                datasets: datasets
-            },
-            options: {
-                animation: false
-            },
-            plugins: {
-                legends : {
-                    display : true
-                },
-                title : {
-                    display : true,
-                    text : title
-                }
-            },
+          data: {
+              datasets: datasets
+          },
             scales : {
                 x: {
-                    min: data.bounds.min,
-                    max: data.bounds.max,
+                    min: data.min.getTime(),
+                    max: data.max.getTime(),
                     ticks: {
                         callback: (value: Date | number)  => this.formatter.format(value)
                     }
                 },
                 y: {
-                    min: 0.0,
-                    max: 100.0,
+                    min: info.min,
+                    max: info.max,
                     ticks: {
-                        callback: (value : number ) => `${value}${unit}`
+                        callback: (value : number ) => `${value}${info.units}`
                     }
                 }
             }
@@ -67,7 +51,7 @@ class ChartConfiguration {
 }
 
 
-class Graphic {
+export class Graphic {
    configuration: ChartConfiguration;
   element: DOM;
     /**
@@ -83,18 +67,14 @@ class Graphic {
         this.element.empty();
     }
 
-    /**
-     *
-     * @param {GraphDataSet} data
-     * @param {string} parameter
-     * @returns {Promise<void>}
-     */
-    async draw(data: GraphDataSet,parameter: Parameter) {
+
+    async render(data: GraphDataSet,parameter: Parameter) {
         this.clean();
         let config = this.configuration.config(data,parameter);
         let canvas = new DOM('canvas').addClass(parameter);
         new Chart(canvas.dom as HTMLCanvasElement, config);
         this.element.append(canvas);
+        return this.configuration.title;
     }
 }
 

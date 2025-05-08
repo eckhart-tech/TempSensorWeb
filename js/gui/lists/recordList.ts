@@ -28,8 +28,6 @@ export class RecordTable extends Table<DOMTable> {
 
   constructor(tag = "records",klass : string = "rec", title : string | null = null) {
     super(tag,klass,title);
-    //this.knownBeacons = knownBeacons;
-    //this.anomalousBeacons = new Set();
   }
 
   getNew(...args: any[]): DOMTable {

@@ -69,10 +69,7 @@ export class DOMTable extends DOMElement {
 
 }
 
-type Constructible = new (...args : any[]) => {};
-function Make<T extends Constructible>(Base : T) {
-    return class S extends Base {};
-}
+
 
 
 

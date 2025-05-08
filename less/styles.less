@@ -49,30 +49,50 @@ table {
   }
 }
 
-#beacons {
-  table {
-    tr.active td {
-      .inputs(red);
+main {
+  display: flex;
+  width: 100%;
+  margin: 0;
+  justify-content: space-around;
+
+  article {
+    padding: 10px;
+    border-right: 1px solid black;
+    #beacons {
+      table {
+        tr.active td {
+          .inputs(red);
+        }
+      }
     }
+    #records {
+      table {
+        td, th {
+          .textFont(0.5em);
+        }
+        tr {
+          &.hide {
+            display:none;
+          }
+          &.anomaly td {
+            font-style: italic;
+            color: red;
+          }
+        }
+      }
+    }
+
+  }
+  #graph {
+    margin:10px;
+    flex: 1;
+
   }
 }
 
-#records {
-  table {
-    td, th {
-      .textFont(0.5em);
-    }
-    tr {
-      &.hide {
-        display:none;
-      }
-      &.anomaly td {
-        font-style: italic;
-        color: red;
-      }
-    }
-  }
-}
+
+
+
 
 
 

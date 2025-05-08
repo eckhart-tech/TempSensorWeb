@@ -1,3 +1,4 @@
-export { Record, Beacon } from './records';
-export { Records, Beacons } from './loader';
+export { Record, Records } from './records';
+export { Beacon, Beacons } from './beacons';
 export { BaseRecord, BaseRecordSet } from './bases';
+export { beaconLoader, recordLoader } from './loader';
