@@ -10,7 +10,7 @@ export async function beaconLoader(): Promise<Beacons> {
     let m = new Map();
 
     let b = Object.keys(json).map(key => {
-      return new Beacon(key.toString(), json[key].toString());
+      return new Beacon(json[key].toString(), key.toString());
     });
     return new Beacons(b);
 }

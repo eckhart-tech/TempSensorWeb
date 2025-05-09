@@ -1,81 +1,53 @@
 import { Chart } from 'chart.js/auto';
 import { DOM} from '../dom';
-import { GraphDataSet, Parameter, ParameterInfo } from "./graphData";
-import { GraphicConfiguration } from "./configuration";
-
-
-
-
-
-class ChartConfiguration {
-  private formatter: Intl.DateTimeFormat;
-  title: string | null;
-
-  constructor(
-        locale : string = 'en-GB'
-    ) {
-        this.formatter = new Intl.DateTimeFormat(locale);
-        this.title=null;
-    }
-
-
-    config(data: GraphDataSet ,parameter:Parameter): GraphicConfiguration {
-        let datasets = data.dataSet(parameter);
-        let info = new ParameterInfo(parameter);
-        let beacons = data.beacons.join(', ');
-        this.title = `${parameter} for ${beacons} (${info.units})`;
-
-        return {
-            type: 'scatter',
-          data: {
-              datasets: datasets
-          },
-            scales : {
-                x: {
-                    min: data.min.getTime(),
-                    max: data.max.getTime(),
-                    ticks: {
-                        callback: (value: Date | number)  => this.formatter.format(value)
-                    }
-                },
-                y: {
-                    min: info.min,
-                    max: info.max,
-                    ticks: {
-                        callback: (value : number ) => `${value}${info.units}`
-                    }
-                }
-            }
-        };
-    }
-}
-
+import { GraphDataSet } from "./graphData";
+import { GraphicConfiguration, MakeGraphicConfigurations } from "./configuration";
 
 export class Graphic {
-   configuration: ChartConfiguration;
   element: DOM;
-    /**
-     *
-     * @param {string} id
-     */
-    constructor(id: string) {
-        this.configuration = new ChartConfiguration();
-        this.element = DOM.withID(id);
+
+  constructor(id: string) {
+    this.element = DOM.withID(id);
+  }
+
+  clean() {
+    this.element.empty();
+  }
+
+  /*async renderParameter(data: GraphDataSet,parameter: Parameter) {
+      this.clean();
+      let {
+        configuration: config,
+        title: title
+      }
+        = MakeGraphicConfiguration(data, parameter);
+      let canvas = new DOM('canvas').addClass(parameter);
+      new Chart(canvas.dom as HTMLCanvasElement, config);
+      return new DOM('figure').addClass(parameter).appendAll([
+        new DOM('h1').text(title), canvas
+      ]);
+    } */
+
+  async renderChart(c : GraphicConfiguration) {
+    let canvas = new DOM("canvas").addClass(c.klass);
+    new Chart(canvas.dom as HTMLCanvasElement, c.configuration);
+    let dom = new DOM("figure")
+      .appendAll([
+        new DOM("h1").text(c.title),
+        canvas
+      ]);
+    this.element.append(dom);
+
+  }
+
+  async render(data: GraphDataSet) {
+    this.clean();
+    let configurations = MakeGraphicConfigurations(data);
+    for (const c of configurations) {
+      await this.renderChart(c);
     }
 
-    clean() {
-        this.element.empty();
-    }
-
-
-    async render(data: GraphDataSet,parameter: Parameter) {
-        this.clean();
-        let config = this.configuration.config(data,parameter);
-        let canvas = new DOM('canvas').addClass(parameter);
-        new Chart(canvas.dom as HTMLCanvasElement, config);
-        this.element.append(canvas);
-        return this.configuration.title;
-    }
+  }
 }
 
 

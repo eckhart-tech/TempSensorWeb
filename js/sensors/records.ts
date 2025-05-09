@@ -3,10 +3,7 @@ import { BaseRecord, BaseRecordSet } from "./bases";
 
 
 
-class Valid {
-
-
-    static asString(x : any) {
+function asString(x : any) : string {
         if (x === null || x === undefined) {
             throw new Error('Not a String');
         }
@@ -14,7 +11,7 @@ class Valid {
     }
 
 
-    static asNumber(x: any) {
+function asNumber(x: any) : number {
         let y = parseFloat(x);
         if (Number.isNaN(y)) {
             throw new Error('Not a number');
@@ -22,28 +19,32 @@ class Valid {
         return y;
     }
 
-    static asPercentage(x: any) {
-        let y = Valid.asNumber(x);
+function asPercentage(x: any) : number {
+        let y = asNumber(x);
         if (y < 0.0 || y > 100.0) {
             throw new Error('Not a percentage');
         }
         return y;
     }
 
-    static asDate(x: any) {
-        let y = Valid.asNumber(x);
+function asDate(x: any) : Date {
+        let y = asNumber(x);
         let d = new Date(y*1000.0);
         if (Number.isNaN(d.valueOf())) {
             throw new Error('Not a date');
         }
         return d;
-    }
-
-
 }
 
 
-
+interface JSONRecord {
+  mac? : any,
+  sensor?: any,
+  timestamp?: any,
+  temperature?: any,
+  humidity?: any,
+  battery?: any
+}
 
 export class Record extends BaseRecord {
 
@@ -58,24 +59,18 @@ export class Record extends BaseRecord {
 
 
   constructor(
-    x = {}
+    x : JSONRecord = {}
   ) {
     super();
     this.valid = true;
     try {
-      // @ts-ignore
-      this.mac = Valid.asString(x.mac);
-      // @ts-ignore
-      this.sensor = Valid.asString(x.sensor);
-      // @ts-ignore
-      this.timestamp = Valid.asDate(x.timestamp);
+      this.mac = asString(x.mac);
+      this.sensor = asString(x.sensor);
+      this.timestamp = asDate(x.timestamp);
       this.time = undefined;
-      // @ts-ignore
-      this.temperature = Valid.asNumber(x.temperature);
-      // @ts-ignore
-      this.humidity = Valid.asPercentage(x.humidity);
-      // @ts-ignore
-      this.battery = Valid.asPercentage(x.battery);
+      this.temperature = asNumber(x.temperature);
+      this.humidity = asPercentage(x.humidity);
+      this.battery = asPercentage(x.battery);
     } catch (e) {
       console.error(`Error : ${e.toString()}`);
       this.valid = false;
@@ -88,9 +83,7 @@ export class Record extends BaseRecord {
   }
 
 
-  ordinal() {
-    return this.timestamp.valueOf();
-  }
+
 
   toString(): string {
     return '';

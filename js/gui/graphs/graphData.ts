@@ -4,28 +4,30 @@ import {Record, Records } from "../../sensors";
 import { RecordItem, RecordValue } from "./configuration";
 
 
-export enum Parameter {
+enum _Parameter {
   Temperature = 'temperature',
   Humidity = 'humidity',
   Battery = 'battery',
 }
 
 
-export class ParameterInfo {
-  readonly parameter: Parameter;
+
+export class Parameter {
+  readonly parameter: _Parameter;
   readonly units: string;
   readonly min: number;
   readonly max: number;
 
-  constructor(parameter : Parameter) {
+
+  constructor(parameter : _Parameter) {
     this.parameter=parameter;
 
       switch(parameter) {
-        case Parameter.Temperature:
+        case _Parameter.Temperature:
           this.units = 'C';
           break;
-        case Parameter.Battery:
-        case Parameter.Humidity:
+        case _Parameter.Battery:
+        case _Parameter.Humidity:
           this.units = '%';
           break;
         default:
@@ -36,11 +38,19 @@ export class ParameterInfo {
     this.min=0;
       this.max=100;
   }
+
+  toString(): string { return this.parameter; }
+
+  static Temperature = new Parameter(_Parameter.Temperature);
+  static Humidity = new Parameter(_Parameter.Humidity);
+  static Battery = new Parameter(_Parameter.Battery);
+
+  static All = [Parameter.Temperature,Parameter.Humidity,Parameter.Battery];
 }
 
 
 function getParameter(record: Record, parameter: Parameter) : number {
-  return record[parameter];
+  return record[parameter.parameter];
 }
 
 
@@ -82,7 +92,7 @@ export class GraphDataSet {
     dataSet(parameter: Parameter) : RecordItem[] {
         return this.records.map(d => {
           let values: RecordValue[] = d.records.map(r => {
-            return {x: r.timestamp.getTime(), y: r[parameter] as number};
+            return {x: r.timestamp.getTime(), y: r[parameter.parameter] as number};
           });
           return {
             label: d.beacon,

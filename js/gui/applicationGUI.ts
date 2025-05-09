@@ -5,8 +5,8 @@
 import { BaseRecord, BaseRecordSet, Beacon, Beacons, Records, beaconLoader, recordLoader } from "../sensors";
 import {BeaconEvent, BeaconTable, RecordTable} from './lists';
 import { ESSet } from "../lib/XSet";
-import { chartInit, Graphic } from "./graphs";
-import { GraphDataSet, Parameter } from "./graphs/graphData";
+import { Graphic } from "./graphs";
+import { GraphDataSet } from "./graphs/graphData";
 
 
 
@@ -50,10 +50,6 @@ export class ApplicationGUI {
     this.beaconTable = new BeaconTable('Known beacons','bcn-known');
     this.extraTable = new BeaconTable('Additional beacons','bcn-extra');
     this.recordTable = new RecordTable();
-
-    chartInit();
-
-
   }
 
   /**
@@ -68,7 +64,7 @@ export class ApplicationGUI {
     this.recordTable?.filter(filter);
 
     let temps = new GraphDataSet(this.records,[...filter]);
-    await this.graphic.render(temps,Parameter.Temperature);
+    await this.graphic.render(temps);
   }
 
   async load() {
