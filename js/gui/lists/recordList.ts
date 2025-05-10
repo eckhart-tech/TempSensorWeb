@@ -3,10 +3,6 @@ import { Record } from "../../sensors";
 import {Table} from './base';
 import { ESSet } from "../../lib/XSet";
 
-
-
-
-
 export class RecordTable extends Table<DOMTable> {
   tag: string;
   base: DOM;
@@ -35,13 +31,7 @@ export class RecordTable extends Table<DOMTable> {
   }
 
   callback(event: MouseEvent) {
-    try {
-      let row = RecordTable.eventTargetParent(event);
-      let index = RecordTable.check(parseInt(new DOM(row).getAttr("index")));
-      console.log(`Clicked on row ${index}`);
-    } catch (e) {
-      console.error(`Bad click : ${e.toString()}`);
-    }
+
   }
 
 

@@ -1,8 +1,7 @@
-import {DOM, DOMTable} from "../dom";
+import {DOM, DOMTableBase} from "../dom";
 import {BaseRecord, BaseRecordSet} from "../../sensors";
-import {ESSet} from "../../lib/XSet";
 
-export abstract class Table<TAB extends DOMTable> {
+export abstract class Table<TAB extends DOMTableBase> {
   tag: string;
   base: DOM;
   rows: BaseRecord[];
@@ -24,19 +23,6 @@ export abstract class Table<TAB extends DOMTable> {
     return x;
   }
 
-  static eventTargetParent(e: MouseEvent): Element {
-    let target = Table.check(e.target as Element);
-    let tag = Table.check(target.tagName).toUpperCase();
-    switch (tag) {
-      case "TD":
-        return Table.check(target.parentElement);
-      case "TR":
-        return target;
-      default:
-        throw new Error(`Unexpected event source ${tag}`);
-    }
-  }
-
   protected constructor(tag: string,klass: string,title : string|null = null) {
     this.tag = tag;
     this.base = DOM.withID(this.tag);
@@ -45,8 +31,6 @@ export abstract class Table<TAB extends DOMTable> {
     this.Klass = klass;
     this.title = title;
   }
-
-
 
   abstract callback(event: MouseEvent): void;
   abstract getNew(...args: any[]): TAB;

@@ -59,9 +59,26 @@ main {
     padding: 10px;
     border-right: 1px solid black;
     #beacons {
-      table {
-        tr.active td {
-          .inputs(red);
+      header {
+        ul {
+          display: none;
+        }
+      }
+      main {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        ul {
+          .border();
+          padding: 5px;
+          margin: 2px;
+          list-style-type: none;
+          &.active {
+            .inputs(red);
+          }
+          li {
+            .textFont(0.8em);
+          }
         }
       }
     }

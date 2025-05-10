@@ -1,24 +1,36 @@
-import {DOM, SelectableDOMTable} from '../dom';
+import {DOM, CSSTable} from '../dom';
 import {Beacon} from '../../sensors';
 import {Table} from './base';
 import {BeaconEvent} from "./events";
 
 
-export class BeaconTable extends Table<SelectableDOMTable> {
+export class BeaconTable extends Table<CSSTable> {
   tag: string;
   base: DOM;
   rows: Beacon[];
-  table: SelectableDOMTable;
+  table: CSSTable;
 
   Headers = ["Name", "MAC"];
 
+  static eventTargetParent(e: MouseEvent): Element {
+    let target = Table.check(e.target as Element);
+    let tag = Table.check(target.tagName).toUpperCase();
+    switch (tag) {
+      case 'LI':
+        return Table.check(target.parentElement);
+      case "UL":
+        return target;
+      default:
+        throw new Error(`Unexpected event source ${tag}`);
+    }
+  }
 
   constructor(title: string,klass: string,tag = "beacons") {
     super(tag,klass,title);
   }
 
-  getNew(...args: any[]): SelectableDOMTable {
-    return new SelectableDOMTable(...args);
+  getNew(...args: any[]): CSSTable {
+    return new CSSTable(...args);
   }
 
   /**
