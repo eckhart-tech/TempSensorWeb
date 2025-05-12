@@ -17,7 +17,7 @@ class ExtraBeacons extends BaseRecordSet {
     super();
 
     let extraNames = records.names.difference(beacons.names);
-    this.extraBeacons = [...extraNames].map((n) => new Beacon(n, n));
+    this.extraBeacons = [...extraNames].map((n) => new Beacon(n, n, false));
   }
 
   get items() {

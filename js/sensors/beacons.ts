@@ -19,6 +19,10 @@ export class Beacon extends BaseRecord {
   get array() {
     return [this.name, this.mac];
   }
+
+  get object() {
+    return this;
+  }
 }
 
 export class Beacons extends BaseRecordSet {

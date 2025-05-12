@@ -1,11 +1,13 @@
-import {DOM, DOMTableBase} from "../dom";
+import { DOM, DOMElement, DOMTableBase } from "../dom";
 import {BaseRecord, BaseRecordSet} from "../../sensors";
 
-export abstract class Table<TAB extends DOMTableBase> {
+export abstract class Table {
   tag: string;
+  kind: string;
+  body: string;
   base: DOM;
   rows: BaseRecord[];
-  table: TAB;
+  table: DOMTableBase;
 
   abstract Headers: string[];
   Klass: string;
@@ -23,8 +25,15 @@ export abstract class Table<TAB extends DOMTableBase> {
     return x;
   }
 
-  protected constructor(tag: string,klass: string,title : string|null = null) {
+  protected constructor(
+    tag: string,
+    kind: string,
+    body: string,
+    klass: string,
+    title : string|null = null) {
     this.tag = tag;
+    this.kind = kind;
+    this.body=body;
     this.base = DOM.withID(this.tag);
     this.rows = [];
     this.table = null;
@@ -33,12 +42,21 @@ export abstract class Table<TAB extends DOMTableBase> {
   }
 
   abstract callback(event: MouseEvent): void;
-  abstract getNew(...args: any[]): TAB;
+
+  abstract makeHeader() : DOMElement|null;
+  abstract makeRow(row: BaseRecord) : DOMElement;
 
   render(data: BaseRecordSet,reset=true): void {
     this.rows = data.items;
-    let trs = this.rows.map((b) => b.array);
-    this.table = this.getNew(this.Headers, trs, this.title, this.Klass);
+    let trs = this.rows.map((b) => this.makeRow(b));
+    this.table = new DOMTableBase(
+      this.kind,
+      this.body,
+      this.makeHeader(),
+      trs,
+      this.title,
+      this.Klass
+    );
     this.table.load();
     this.table.addListener((ev) => this.callback(ev as MouseEvent));
     if(reset) { this.base.empty(); }
@@ -47,5 +65,13 @@ export abstract class Table<TAB extends DOMTableBase> {
 
   get tableRows(): DOM[] {
     return this.table.dataRows;
+  }
+
+  get activeRows(): DOM[] {
+    return this.table.activeRows;
+  }
+
+  get activeIndices(): number[] {
+    return this.table.activeIndices;
   }
 }

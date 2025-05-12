@@ -1,22 +1,43 @@
-import {DOM, CSSTable} from '../dom';
-import {Beacon} from '../../sensors';
+import { DOM, DOMElement } from "../dom";
+import { BaseRecord, Beacon } from "../../sensors";
 import {Table} from './base';
 import {BeaconEvent} from "./events";
+import { TableUnit } from "../dom/elements/tableBase";
 
 
-export class BeaconTable extends Table<CSSTable> {
+export class BeaconCell extends DOMElement {
+
+  readonly event: string = "click";
+
+  constructor(beacon: Beacon) {
+    super('li');
+    if (!beacon.known) {
+      this.dom.addClass('unknown');
+    }
+    this.dom.append(new DOM('dl').appendAll([
+      new DOM('dt').text('name'),
+      new DOM('dd').text(beacon.name),
+      new DOM('dt').text('MAC'),
+      new DOM('dd').text(beacon.mac)
+    ]));
+    this.dom.append(new DOM('aside').text(beacon.known? '.' : '!'));
+  }
+}
+
+
+
+export class BeaconTable extends Table {
   tag: string;
   base: DOM;
   rows: Beacon[];
-  table: CSSTable;
 
-  Headers = ["Name", "MAC"];
+  Headers = ["Name", "MAC", ""];
 
   static eventTargetParent(e: MouseEvent): Element {
     let target = Table.check(e.target as Element);
     let tag = Table.check(target.tagName).toUpperCase();
     switch (tag) {
-      case 'LI':
+      case "LI":
         return Table.check(target.parentElement);
       case "UL":
         return target;
@@ -25,12 +46,16 @@ export class BeaconTable extends Table<CSSTable> {
     }
   }
 
-  constructor(title: string,klass: string,tag = "beacons") {
-    super(tag,klass,title);
+  constructor(title: string, klass: string, tag = "beacons") {
+    super(tag, 'nav','ul',klass, title);
   }
 
-  getNew(...args: any[]): CSSTable {
-    return new CSSTable(...args);
+  makeHeader(): DOMElement | null {
+    return null;
+  }
+
+  makeRow(row: BaseRecord): DOMElement {
+    return new BeaconCell(row as Beacon);
   }
 
   /**
@@ -52,7 +77,7 @@ export class BeaconTable extends Table<CSSTable> {
   }
 
   get active() {
-    let ind = this.table.activeIndices;
+    let ind: number[] = this.table.activeIndices;
     return ind.map((idx) => this.rows[idx]);
   }
 }

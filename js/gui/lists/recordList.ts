@@ -1,15 +1,30 @@
-import {DOM, DOMTable} from '../dom';
-import { Record } from "../../sensors";
+import { DOM, DOMElement } from "../dom";
+import { BaseRecord, Beacon, Record } from "../../sensors";
 import {Table} from './base';
 import { ESSet } from "../../lib/XSet";
 
-export class RecordTable extends Table<DOMTable> {
+export class RecordCell extends DOMElement {
+
+  readonly event: string = "click";
+
+  constructor(record: Record) {
+    super('tr');
+    this.dom.appendAll(record.array.map(x => new DOM('td').text(x)));
+  }
+}
+
+class RecordHeader extends DOMElement {
+  constructor(fields: string[]) {
+    super('tr');
+    this.dom.appendAll(fields.map(x => new DOM('th').text(x)));
+  }
+}
+
+export class RecordTable extends Table {
   tag: string;
   base: DOM;
   rows: Record[];
-  table: DOMTable;
   allBeacons: ESSet<string>;
-
 
   Headers = [
     "Name",
@@ -20,23 +35,23 @@ export class RecordTable extends Table<DOMTable> {
     "Battery (%)",
   ];
 
-
-
-  constructor(tag = "records",klass : string = "rec", title : string | null = null) {
-    super(tag,klass,title);
+  constructor(
+    tag = "records",
+    klass: string = "rec",
+    title: string | null = null,
+  ) {
+    super(tag, 'nav', 'table',klass, title);
   }
 
-  getNew(...args: any[]): DOMTable {
-    return new DOMTable(...args);
+  callback(event: MouseEvent) {}
+
+  makeHeader(): DOMElement | null {
+    return new RecordHeader(this.Headers);
   }
 
-  callback(event: MouseEvent) {
-
+  makeRow(row: BaseRecord): DOMElement {
+    return new RecordCell(row as Record);
   }
-
-
-
-
 
   reset() {
     this.tableRows.forEach((row) => row.removeClass("hide"));
@@ -62,8 +77,6 @@ export class RecordTable extends Table<DOMTable> {
         displayAll || active.has(b),
       );
     });
-    console.log(
-      `Loaded ${this.tableRows.length} rows; ${visible} visible`,
-    );
+    console.log(`Loaded ${this.tableRows.length} rows; ${visible} visible`);
   }
 }

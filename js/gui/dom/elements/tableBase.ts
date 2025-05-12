@@ -6,36 +6,28 @@ export enum TableUnit {
   Data = 'td'
 }
 
-export interface TableTags {
-  main: string,
-  header : string,
-  body: string,
-  title: string
-}
-export abstract class DOMTableBase extends DOMElement {
-  readonly rows: string[][];
+
+export class DOMTableBase extends DOMElement {
+  readonly rows: DOMElement[];
   body: DOM;
   dataRows: DOM[];
   readonly event : string = "click";
 
-  abstract makeRow(kind: TableUnit,values: string[]) : DOM;
-
-  protected constructor(tags: TableTags,
-                        headers: string[] = [],
-                        rows: string[][] = [],
+  constructor(tag: string,
+                        body: string,
+                        headers: DOMElement|null = null,
+                        rows: DOMElement[] = [],
                         title: string | null = null,
                         klass: string | null = null,
   ) {
-    super(tags.main);
-    this.body = new DOM(tags.body);
-    let headerItems : DOM[] = [
-      this.makeRow(TableUnit.Header, headers)
-    ];
+    super(tag);
+    this.body = new DOM(body);
+    let headerItems : DOM[] = (headers===null) ? [] : [headers.dom];
     if(title!==null) {
-      headerItems.splice(0,0,new DOM(tags.title).text(title));
+      headerItems.splice(0,0,new DOM('h1').text(title));
     }
     this.dom.appendAll([
-      new DOM(tags.header).appendAll(headerItems),
+      new DOM('header').appendAll(headerItems),
       this.body
     ]);
     if (klass !== null) {
@@ -52,7 +44,7 @@ export abstract class DOMTableBase extends DOMElement {
   load(first: number = 0, last: number = Number.POSITIVE_INFINITY) {
     let range = this.rows.filter((_, idx) => idx >= first && idx < last);
     this.dataRows = range.map((row, idx) => {
-      return this.makeRow(TableUnit.Data,row).setAttrs({index: idx});
+      return row.dom.setAttrs({index: idx});
     });
     this.body.empty().appendAll(this.dataRows);
   }

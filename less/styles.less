@@ -60,24 +60,41 @@ main {
     border-right: 1px solid black;
     #beacons {
       header {
-        ul {
-          display: none;
-        }
       }
-      main {
+      ul {
         display: flex;
         flex-wrap: wrap;
         justify-content: space-between;
-        ul {
+        li {
           .border();
           padding: 5px;
-          margin: 2px;
           list-style-type: none;
+          display:flex;
+          justify-content: space-around;
+          align-items: center;
           &.active {
             .inputs(red);
           }
-          li {
-            .textFont(0.8em);
+          dl {
+            .textFont(0.6em);
+            display: inline-grid;
+            grid-template-columns: 1fr 3fr;
+            padding: 2px;
+            max-width: 10vw;
+
+
+            dd {
+              padding: 0;
+              margin: 0 auto 0 0 ;
+            }
+            dt {
+              padding-right: 10px;
+              margin: 0;
+            }
+          }
+          aside {
+            margin-left: 0;
+            .monoFont(0.8em);
           }
         }
       }
