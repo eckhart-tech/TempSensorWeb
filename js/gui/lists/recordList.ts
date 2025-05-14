@@ -40,17 +40,14 @@ export class RecordTable extends Table {
     klass: string = "rec",
     title: string | null = null,
   ) {
-    super(tag, 'nav', 'table',klass, title);
+    super(tag,klass, title);
   }
 
   callback(event: MouseEvent) {}
 
-  makeHeader(): DOMElement | null {
-    return new RecordHeader(this.Headers);
-  }
 
-  makeRow(row: BaseRecord): DOMElement {
-    return new RecordCell(row as Record);
+  makeRow(row: BaseRecord): DOM[] {
+    return (row as Record).array.map(d => new DOM('td').text(d));
   }
 
   reset() {

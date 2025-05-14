@@ -8,31 +8,22 @@ export enum TableUnit {
 
 
 export class DOMTableBase extends DOMElement {
-  readonly rows: DOMElement[];
-  body: DOM;
+  headers: string[];
+  klass : string | null;
+  readonly rows: DOM[][];
   dataRows: DOM[];
   readonly event : string = "click";
 
-  constructor(tag: string,
-                        body: string,
-                        headers: DOMElement|null = null,
-                        rows: DOMElement[] = [],
-                        title: string | null = null,
+  constructor(
+                        headers: string[] = [],
+                        rows: DOM[][] = [],
                         klass: string | null = null,
   ) {
-    super(tag);
-    this.body = new DOM(body);
-    let headerItems : DOM[] = (headers===null) ? [] : [headers.dom];
-    if(title!==null) {
-      headerItems.splice(0,0,new DOM('h1').text(title));
-    }
-    this.dom.appendAll([
-      new DOM('header').appendAll(headerItems),
-      this.body
-    ]);
-    if (klass !== null) {
-      this.dom.addClass(klass);
-    }
+    super('table');
+    this.headers=headers;
+    this.klass=klass;
+
+
     this.rows = rows;
     this.dataRows = [];
   }
@@ -42,18 +33,28 @@ export class DOMTableBase extends DOMElement {
   }
 
   load(first: number = 0, last: number = Number.POSITIVE_INFINITY) {
+
+    this.dom.empty();
+    if(this.headers.length>0) {
+      let headerItems : DOM[] = this.headers.map(h => new DOM('th').text(h));
+      this.dom.append(new DOM('tr').appendAll(headerItems));
+    }
+    if (this.klass !== null) {
+      this.dom.addClass(this.klass);
+    }
+
     let range = this.rows.filter((_, idx) => idx >= first && idx < last);
     this.dataRows = range.map((row, idx) => {
-      return row.dom.setAttrs({index: idx});
+      return new DOM('tr').setAttrs({index: idx}).appendAll(row);
     });
-    this.body.empty().appendAll(this.dataRows);
+    this.dom.appendAll(this.dataRows);
   }
 
   addListener(
     listener: EventListenerOrEventListenerObject,
     options: AddEventListenerOptions = null,
   ) {
-    this.body.addEventListener("click",listener,options);
+    this.dom.addEventListener("click",listener,options);
     return this.dom;
   }
 

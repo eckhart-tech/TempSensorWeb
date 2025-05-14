@@ -1,0 +1,56 @@
+@import "utils.less";
+
+.beacons() {
+  table {
+    .table(0.8em,false);
+    display: flex;
+    flex-wrap: wrap;
+    tr.active {
+      background-color: red;
+    }
+    td {
+      display: flex;
+      justify-content: flex-start;
+      align-content: center;
+      padding: 0 2px 0 2px;
+      }
+      ul {
+        list-style-type: none;
+      }
+      aside {
+        margin: 0;
+        .monoFont(0.6em);
+        writing-mode: vertical-rl;
+        text-orientation: sideways;
+      }
+    }
+
+}
+
+
+.records()
+{
+  padding: 10px;
+  border-right: 1px solid black;
+  table {
+    .table(0.5em);
+    tr.anomaly td {
+      font-style: italic;
+      color: red;
+    }
+  }
+}
+
+.graph(){
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  margin:0;
+  height: 100%;
+  flex: 1;
+  figure {
+    max-height: 30vh;
+    padding: 1em;
+  }
+}

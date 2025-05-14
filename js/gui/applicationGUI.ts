@@ -38,7 +38,6 @@ export class ApplicationGUI {
   private beacons: Beacons;
   private extraBeacons : ExtraBeacons | null;
   private beaconTable : BeaconTable;
-  private extraTable : BeaconTable;
   private recordTable : RecordTable;
   graphic : Graphic | null;
 
@@ -47,8 +46,7 @@ export class ApplicationGUI {
     this.beacons = new Beacons();
 
 
-    this.beaconTable = new BeaconTable('Known beacons','bcn-known');
-    this.extraTable = new BeaconTable('Additional beacons','bcn-extra');
+    this.beaconTable = new BeaconTable('Beacons','bcn-known');
     this.recordTable = new RecordTable();
   }
 
@@ -59,7 +57,7 @@ export class ApplicationGUI {
   async callback(event: BeaconEvent) {
     console.log(event);
 
-    let filter = new ESSet(this.beaconTable.active.concat(this.extraTable.active).map(b => b.name));
+    let filter = new ESSet(this.beaconTable.active.map(b => b.name));
     console.log('Payload is', filter, 'Table is', this.recordTable);
     this.recordTable?.filter(filter);
 
@@ -75,10 +73,7 @@ export class ApplicationGUI {
     console.log('Extra',this.extraBeacons);
 
 
-    this.beaconTable.render(this.beacons);
-    if(this.extraBeacons.length>0) {
-      this.extraTable.render(this.extraBeacons,false);
-    }
+    this.beaconTable.render(this.beacons,this.extraBeacons);
     this.recordTable.render(this.records);
 
     this.graphic = new Graphic('graph');

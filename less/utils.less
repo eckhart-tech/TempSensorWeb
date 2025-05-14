@@ -1,0 +1,39 @@
+.textFont(@size : 1em) {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: @size;
+}
+
+.monoFont(@size : 1em) {
+  font-family: Courier, sans-serif;
+  font-size: @size;
+}
+
+.inputs(@bg : white) {
+  margin: 2px;
+  padding: 2px;
+  background-color: @bg;
+}
+
+
+
+.border(@on : true, @colour : black) {
+  border-style: if((@on = true), solid, none);
+  border-color: @colour;
+  border-width: 1px;
+}
+
+.table(@fontSize, @borderOn: true, @borderColour : true) {
+  border-collapse: collapse;
+  .border(@borderOn, @borderColour);
+  tr {
+    &.hide {
+      display: none;
+    }
+  }
+  td, th {
+    .border(true, @borderColour);
+    .textFont(@fontSize);
+    padding: 0 4px 0 4px;
+    text-align: center;
+  }
+}

@@ -5,57 +5,65 @@ import {BeaconEvent} from "./events";
 import { TableUnit } from "../dom/elements/tableBase";
 
 
-export class BeaconCell extends DOMElement {
 
-  readonly event: string = "click";
 
-  constructor(beacon: Beacon) {
-    super('li');
+  function BeaconCell(beacon: Beacon) : DOM {
+    let dom = new DOM('td');
     if (!beacon.known) {
-      this.dom.addClass('unknown');
+      dom.addClass('unknown');
     }
-    this.dom.append(new DOM('dl').appendAll([
-      new DOM('dt').text('name'),
-      new DOM('dd').text(beacon.name),
-      new DOM('dt').text('MAC'),
-      new DOM('dd').text(beacon.mac)
-    ]));
-    this.dom.append(new DOM('aside').text(beacon.known? '.' : '!'));
-  }
+    dom.appendAll([
+      new DOM('ul').appendAll([
+        new DOM('li').text(beacon.name).addClass('name'),
+        new DOM('li').text(beacon.mac).addClass('mac')
+      ]),
+      new DOM('aside').text(beacon.known ? ' ' : 'unk')
+    ]);
+  return dom;
 }
 
 
+
+
+function isValid(x : string|number|Element) : boolean {
+  return !(x===null || x=== undefined || Number.isNaN(x));
+}
+
+
+function parseSafe(x: string): number {
+  let y = parseInt(x);
+    if (!isValid(y)) {
+    throw new Error(`Bad tag value {x}`);
+  }
+  return y;
+}
 
 export class BeaconTable extends Table {
   tag: string;
   base: DOM;
   rows: Beacon[];
 
-  Headers = ["Name", "MAC", ""];
+  Headers: string[] = [];
 
   static eventTargetParent(e: MouseEvent): Element {
-    let target = Table.check(e.target as Element);
-    let tag = Table.check(target.tagName).toUpperCase();
-    switch (tag) {
-      case "LI":
-        return Table.check(target.parentElement);
-      case "UL":
+    let target = e.target as Element;
+    while(isValid(target)) {
+      let tag = target.tagName?.toUpperCase();
+      if(tag==='TR') {
         return target;
-      default:
-        throw new Error(`Unexpected event source ${tag}`);
+      }
+      target = target.parentElement;
     }
+    throw new Error(`Unexpected event source ${e.target}`);
   }
 
   constructor(title: string, klass: string, tag = "beacons") {
-    super(tag, 'nav','ul',klass, title);
+    super(tag,klass, title);
   }
 
-  makeHeader(): DOMElement | null {
-    return null;
-  }
 
-  makeRow(row: BaseRecord): DOMElement {
-    return new BeaconCell(row as Beacon);
+  makeRow(row: BaseRecord): DOM[] {
+    return [BeaconCell(row as Beacon)];
   }
 
   /**
@@ -65,7 +73,7 @@ export class BeaconTable extends Table {
   callback(event: MouseEvent) {
     try {
       let row = BeaconTable.eventTargetParent(event);
-      let index = BeaconTable.check(parseInt(new DOM(row).getAttr("index")));
+      let index = parseSafe(new DOM(row).getAttr("index"));
       let clicked = this.rows[index];
       console.log(`Clicked on row ${index} : ${clicked.toString()}`);
       this.table.toggleRow(index);
