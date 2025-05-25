@@ -1,13 +1,19 @@
-import { DOM, DOMElement } from "../dom";
+import { DOM } from "../dom";
 import { BaseRecord, Beacon } from "../../sensors";
 import {Table} from './base';
 import {BeaconEvent} from "./events";
-import { TableUnit } from "../dom/elements/tableBase";
 
 
 
 
-  function BeaconCell(beacon: Beacon) : DOM {
+  function BeaconCell(beacon: Beacon) : DOM[] {
+   return [
+      new DOM('td').text(beacon.name).addClass('name').addClass('l'),
+      new DOM('td').text(beacon.mac).addClass('mac').addClass('l'),
+      new DOM('td').text(beacon.known ? 'Y' : 'N').addClass('c'),
+      new DOM('td').text(beacon.count.toString()).addClass('r')
+    ];
+   /*
     let dom = new DOM('td');
     if (!beacon.known) {
       dom.addClass('unknown');
@@ -20,6 +26,8 @@ import { TableUnit } from "../dom/elements/tableBase";
       new DOM('aside').text(beacon.known ? ' ' : 'unk')
     ]);
   return dom;
+  */
+
 }
 
 
@@ -31,11 +39,11 @@ function isValid(x : string|number|Element) : boolean {
 
 
 function parseSafe(x: string): number {
-  let y = parseInt(x);
-    if (!isValid(y)) {
-    throw new Error(`Bad tag value {x}`);
+  let nn = parseInt(x);
+    if (!isValid(nn)) {
+    throw new Error(`Bad tag value ${x}`);
   }
-  return y;
+  return nn;
 }
 
 export class BeaconTable extends Table {
@@ -43,7 +51,7 @@ export class BeaconTable extends Table {
   base: DOM;
   rows: Beacon[];
 
-  Headers: string[] = [];
+  Headers: string[] = ['Beacon Name','MAC Address','Is known?','N Records'];
 
   static eventTargetParent(e: MouseEvent): Element {
     let target = e.target as Element;
@@ -63,7 +71,7 @@ export class BeaconTable extends Table {
 
 
   makeRow(row: BaseRecord): DOM[] {
-    return [BeaconCell(row as Beacon)];
+    return BeaconCell(row as Beacon);
   }
 
   /**

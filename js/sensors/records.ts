@@ -1,5 +1,8 @@
 
 import { BaseRecord, BaseRecordSet } from "./bases";
+import { Beacon } from "./beacons";
+import { ESSet } from "../lib/XSet";
+import { InitListDict } from "../lib/InitListDict";
 
 
 
@@ -98,33 +101,40 @@ export class Record extends BaseRecord {
   export class Records extends BaseRecordSet {
 
   data : Record[];
-  beaconData : Map<string,Record[]>;
+  beacons : Beacon[];
+
+  beaconData : InitListDict<string,Record>;
   min: Date;
   max: Date;
-  constructor(records: Record[] = []) {
+  constructor(records: Record[] = [],beacons: Beacon[] = []) {
     super();
     this.data = records;
     let times = records.map(r => r.timestamp.getTime());
     this.min = new Date(Math.min(...times));
     this.max = new Date(Math.max(...times));
 
-    this.beaconData = new Map();
+    this.beacons = [];
+    this.beaconData = new InitListDict();
 
     this.data.forEach(record => {
-      let sensor = record.sensor;
-      if (!this.beaconData.has(sensor)) {
-        this.beaconData.set(sensor,[]);
-      }
-      this.beaconData.get(sensor).push(record);
+      this.beaconData.set(record.sensor,record);
+    });
+
+    let bNames = new ESSet(beacons.map(b => b.name));
+    let extraNames = new ESSet(this.beaconData.keys).difference(bNames);
+    this.beacons = [...extraNames].map(n => {
+      return new Beacon(n, n, false);
     });
   }
 
   get items() { return this.data; }
-
+  get count() : Map<string,number> {
+    return this.beaconData.map(rs => rs.length);
+  }
 
 
   get keys(): string[] {
-    return Array.from(this.beaconData.keys());
+    return this.beaconData.keys;
   }
 
   filter(key: string): Record[] {

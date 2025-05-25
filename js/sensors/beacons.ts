@@ -4,12 +4,14 @@ export class Beacon extends BaseRecord {
   readonly name: string;
   readonly mac : string;
   readonly known: boolean;
+  count : number;
 
-  constructor(name: string, mac: string, known: boolean=true) {
+  constructor(name: string, mac: string, known: boolean=true, count: number = 0) {
     super();
     this.name = name;
     this.mac = mac;
     this.known = known;
+    this.count = count;
   }
 
   toString() {
@@ -36,7 +38,9 @@ export class Beacons extends BaseRecordSet {
     return this.beacons;
   }
 
-
+  setCounts(m : Map<string,number>) {
+    this.beacons.forEach(b => b.count = m.get(b.name) ?? 0);
+  }
 
   /**
    *

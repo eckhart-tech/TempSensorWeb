@@ -13,4 +13,8 @@ export abstract class DOMElement {
     this.dom.addEventListener(this.event, listener, options);
     return this.dom;
   }
+
+  add(tag: string) {
+    DOM.withID(tag).append(this.dom);
+  }
 }

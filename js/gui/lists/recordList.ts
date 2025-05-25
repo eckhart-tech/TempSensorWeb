@@ -1,30 +1,15 @@
-import { DOM, DOMElement } from "../dom";
-import { BaseRecord, Beacon, Record } from "../../sensors";
+import { DOM } from "../dom";
+import { BaseRecord, Record } from "../../sensors";
 import {Table} from './base';
-import { ESSet } from "../../lib/XSet";
 
-export class RecordCell extends DOMElement {
 
-  readonly event: string = "click";
 
-  constructor(record: Record) {
-    super('tr');
-    this.dom.appendAll(record.array.map(x => new DOM('td').text(x)));
-  }
-}
 
-class RecordHeader extends DOMElement {
-  constructor(fields: string[]) {
-    super('tr');
-    this.dom.appendAll(fields.map(x => new DOM('th').text(x)));
-  }
-}
 
 export class RecordTable extends Table {
   tag: string;
   base: DOM;
   rows: Record[];
-  allBeacons: ESSet<string>;
 
   Headers = [
     "Name",

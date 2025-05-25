@@ -2,29 +2,49 @@
 
 .beacons() {
   table {
-    .table(0.8em,false);
-    display: flex;
-    flex-wrap: wrap;
-    tr.active {
-      background-color: red;
-    }
-    td {
-      display: flex;
-      justify-content: flex-start;
-      align-content: center;
-      padding: 0 2px 0 2px;
-      }
-      ul {
-        list-style-type: none;
-      }
-      aside {
-        margin: 0;
-        .monoFont(0.6em);
-        writing-mode: vertical-rl;
-        text-orientation: sideways;
-      }
-    }
+    border-collapse: collapse;
+    border-style: none;
 
+    tr {
+      border-style: none;
+      background-color: burlywood;
+
+      td, th {
+        padding: 4px;
+        margin: 4px;
+        .textFont(0.8em);
+      }
+
+      td {
+        border-width: 2px;
+        border-style: solid inset;
+        border-color: white burlywood;
+        background-color: bisque;
+
+        &.mac {
+          .monoFont(0.8em);
+        }
+        &.l {
+          text-align: left;
+        }
+        &.c {
+          text-align: center;
+        }
+        &.r {
+          text-align: right;
+        }
+      }
+
+      &.active {
+        background-color: red;
+
+        td {
+          background-color: red;
+          border-color: white red;
+        }
+      }
+    }
+  }
 }
 
 

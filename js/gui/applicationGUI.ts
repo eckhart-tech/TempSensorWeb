@@ -7,6 +7,7 @@ import {BeaconEvent, BeaconTable, RecordTable} from './lists';
 import { ESSet } from "../lib/XSet";
 import { Graphic } from "./graphs";
 import { GraphDataSet } from "./graphs/graphData";
+import { DOMButton } from "./dom";
 
 
 
@@ -18,6 +19,12 @@ class ExtraBeacons extends BaseRecordSet {
 
     let extraNames = records.names.difference(beacons.names);
     this.extraBeacons = [...extraNames].map((n) => new Beacon(n, n, false));
+
+
+  }
+
+  setCounts(m : Map<string,number>) {
+    this.extraBeacons.forEach(b => b.count = m.get(b.name) ?? 0);
   }
 
   get items() {
@@ -26,8 +33,7 @@ class ExtraBeacons extends BaseRecordSet {
 
 
 
-
-  filter(key: string): BaseRecord[] {
+  filter(_: string): BaseRecord[] {
     return [];
   }
 }
@@ -40,10 +46,12 @@ export class ApplicationGUI {
   private beaconTable : BeaconTable;
   private recordTable : RecordTable;
   graphic : Graphic | null;
+  controls: DOMButton;
 
   constructor() {
     this.records = new Records();
     this.beacons = new Beacons();
+    this.controls = new DOMButton('Download CSV','download');
 
 
     this.beaconTable = new BeaconTable('Beacons','bcn-known');
@@ -65,16 +73,26 @@ export class ApplicationGUI {
     await this.graphic.render(temps);
   }
 
+  download() {
+    console.log('Callback for downloading CSV');
+  }
+
   async load() {
     this.records = await recordLoader();
     this.beacons = await beaconLoader();
 
     this.extraBeacons = new ExtraBeacons(this.records,this.beacons);
     console.log('Extra',this.extraBeacons);
+    let c = this.records.counts;
+    this.beacons.setCounts(c);
+    this.extraBeacons.setCounts(c);
 
 
     this.beaconTable.render(this.beacons,this.extraBeacons);
     this.recordTable.render(this.records);
+
+    this.controls.addListener(_ => this.download());
+    this.controls.add('data');
 
     this.graphic = new Graphic('graph');
 

@@ -7,7 +7,6 @@ import {Record, Records} from './records';
 export async function beaconLoader(): Promise<Beacons> {
     let loader = new ASRESTApi();
     let json = await loader.beacons();
-    let m = new Map();
 
     let b = Object.keys(json).map(key => {
       return new Beacon(json[key].toString(), key.toString());
