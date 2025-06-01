@@ -1,6 +1,6 @@
 import {ASRESTApi} from "./structure/restWrapper";
-import {Beacon, Beacons} from "./beacons";
-import {Record, Records} from './records';
+import {Records, Beacons} from "./collections";
+import {Record, Beacon} from './items';
 
 
 

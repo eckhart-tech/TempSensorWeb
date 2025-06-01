@@ -1,4 +1,5 @@
-export { Record, Records } from './records';
-export { Beacon, Beacons } from './beacons';
-export { BaseRecord, BaseRecordSet } from './bases';
+export { Record, Beacon, TimeRange } from './items';
+export { Records } from './collections/records';
+export { Beacons } from './collections/beacons';
+export { BaseRecord, BaseRecordSet } from './collections/bases';
 export { beaconLoader, recordLoader } from './loader';

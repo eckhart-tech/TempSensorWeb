@@ -1,13 +1,6 @@
-import { ESSet } from "../lib/XSet";
+import { ESSet } from "../../lib";
+import { BaseRecord} from "../items";
 
-
-
-export abstract class BaseRecord {
-
-    abstract toString() : string;
-    abstract get array() : string[];
-    abstract get name() : string;
-}
 
 export abstract class BaseRecordSet {
     abstract get items() : BaseRecord[];

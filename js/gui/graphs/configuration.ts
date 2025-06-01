@@ -1,6 +1,7 @@
 import { ChartType } from "chart.js";
 import { Chart } from "chart.js/auto";
 import { GraphDataSet, Parameter } from "./graphData";
+import { Format } from "../../lib/formatting";
 
 export function chartInit() {
   Chart.defaults.animation = false;
@@ -45,11 +46,7 @@ export interface GraphicConfiguration    {
   klass: string
 }
 
-let formatter : Intl.DateTimeFormat;
-export function SetLocale(locale : string = 'en-GB') {
-  formatter = new Intl.DateTimeFormat(locale);
-}
-SetLocale();
+
 
 function MakeGraphicConfiguration(data: GraphDataSet ,parameter:Parameter): GraphicConfiguration {
     let datasets = data.dataSet(parameter);
@@ -65,7 +62,7 @@ function MakeGraphicConfiguration(data: GraphDataSet ,parameter:Parameter): Grap
           min: data.min.getTime(),
           max: data.max.getTime(),
           ticks: {
-            callback: (value: number)  => formatter.format(new Date(value))
+            callback: (value: number)  => Format.formatDate(value)
           }
         },
         y: {
