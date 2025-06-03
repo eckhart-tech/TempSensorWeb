@@ -1,9 +1,20 @@
 import { Chart } from 'chart.js/auto';
+//import { Chart, ScatterController, PointElement, LinearScale, Colors, Legend, Title } from "chart.js";
 import { DOM} from '../dom';
 import { GraphDataSet } from "./graphData";
 import { GraphicConfiguration, MakeGraphicConfigurations } from "./configuration";
 
+//Chart.register(
+//  ScatterController, PointElement, LinearScale, Colors, Legend, Title
+//);
+
+
 export class Graphic {
+  static {
+    Chart.defaults.animation = false;
+    Chart.defaults.plugins.legend.display = true;
+    Chart.defaults.plugins.title.display = false;
+  }
   element: DOM;
 
   constructor(id: string) {

@@ -6,7 +6,8 @@ const baseURLS = ((obj) => Object.freeze(obj)) ({
     BASE : '/',
     DATA : '/data',
     BEACONS : '/beacons',
-    SCHEMA : '/schema'
+    SCHEMA : '/schema',
+    RANGE : '/range'
 });
 
 
@@ -56,6 +57,10 @@ export class ASRESTApi {
 
     async beacons() {
         return await this.read(baseURLS.BEACONS);
+    }
+
+    async range() {
+      return await this.read(baseURLS.RANGE);
     }
 
 

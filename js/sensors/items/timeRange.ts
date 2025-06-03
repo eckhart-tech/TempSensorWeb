@@ -2,20 +2,20 @@ import { BaseRecord } from "./base";
 import { convert, Format } from "../../lib";
 
 export class TimeRange extends BaseRecord {
-  readonly start: number;
-  readonly end: number;
-  constructor(start: number, end: number) {
+  readonly start: Date;
+  readonly end: Date;
+  constructor(start: number|string, end: number|string) {
     super();
-    this.start = start;
-    this.end = end;
+    this.start = convert(start).date;
+    this.end = convert(end).date;
   }
 
   get timestamps() : number[] {
-    return [this.start, this.end];
+    return [this.start.getTime(), this.end.getTime()];
   }
 
   get dates() : Date[] {
-    return [convert(this.start).date, convert(this.end).date]
+    return [this.start,this.end]
   }
 
   get array() {

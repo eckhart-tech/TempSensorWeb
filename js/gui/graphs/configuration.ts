@@ -1,20 +1,16 @@
-import { ChartType } from "chart.js";
-import { Chart } from "chart.js/auto";
+import { ChartType, Tick } from "chart.js";
 import { GraphDataSet, Parameter } from "./graphData";
-import { Format } from "../../lib/formatting";
+import { Format } from "../../lib";
 
-export function chartInit() {
-  Chart.defaults.animation = false;
-  Chart.defaults.plugins.legend.display = true;
-  Chart.defaults.plugins.title.display = false;
-}
-chartInit();
+
 
 interface GraphicScale {
-  min: number,
-  max: number,
+  beginAtZero?: boolean,
+  min?: number,
+  max?: number,
   ticks: {
-    callback: (value: Date | number) => string
+    callback: (value : number, index : number , ticks : Tick[]) => string,
+    color? : string
   }
 }
 
@@ -33,10 +29,11 @@ interface ChartConfig {
   data: {
     datasets: RecordItem[]
   },
-
-  scales: {
-    x: GraphicScale,
-    y: GraphicScale
+  options : {
+    scales: {
+      x: GraphicScale,
+      y: GraphicScale
+    }
   }
 }
 
@@ -57,19 +54,27 @@ function MakeGraphicConfiguration(data: GraphDataSet ,parameter:Parameter): Grap
       data: {
         datasets: datasets
       },
-      scales : {
-        x: {
-          min: data.min.getTime(),
-          max: data.max.getTime(),
-          ticks: {
-            callback: (value: number)  => Format.formatDate(value)
-          }
-        },
-        y: {
-          min: parameter.min,
-          max: parameter.max,
-          ticks: {
-            callback: (value : number ) => `${value}${parameter.units}`
+      options : {
+        scales: {
+          x: {
+            beginAtZero: false,
+            //min: data.min.getTime(),
+            //max: data.max.getTime(),
+            ticks: {
+              callback: function(value, index, ticks) {
+                return Format.date(value);
+              }
+            }
+          },
+          y: {
+            beginAtZero: false,
+            //min: parameter.min,
+            //max: parameter.max,
+            ticks: {
+              callback: function(value, index, ticks) {
+                return `${value}${parameter.units}`;
+              }
+            }
           }
         }
       }
