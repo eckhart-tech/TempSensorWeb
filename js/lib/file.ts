@@ -1,18 +1,30 @@
 import { DOM } from "../gui/dom";
 
-class CSVData {
-  readonly headers: string[];
-  rows: string;
+class CSVParameters {
+  field: string;
+  eol: string;
+  quote: string;
+  quoteReplace: string;
 
-  private encode(value: any): string {
+  constructor(field: string = ",", eol: string = "\n", quote: string = '"') {
+    this.field = field;
+    this.eol = eol;
+    this.quote = quote;
+    this.quoteReplace = `\\${quote}`;
+  }
+
+  escape(str: string): string {
+    return str.replaceAll(this.quote, this.quoteReplace);
+  }
+
+  encode(value: any): string {
     switch (typeof value) {
       case "boolean":
         return value ? "true" : "false";
       case "number":
         return value.toString();
       case "string":
-        let escaped = value.replaceAll('"', '"');
-        return `"${escaped}"`;
+        return this.escape(value);
       default:
         if (value instanceof Date) {
           return value.valueOf().toString();
@@ -24,28 +36,33 @@ class CSVData {
     }
   }
 
-  private encodeRow(values: any[]): string {
-    let e = values.map((v) => this.encode(v));
-    return e.join(",");
+  row(values: any[]): string {
+    let coded = values.map((v) => this.encode(v));
+    return `${coded.join(this.field)}${this.eol}`;
   }
+}
 
-  constructor(headers: string[]) {
-    this.headers = headers;
-    this.rows = "";
+export class CSVData {
+  parameters: CSVParameters;
+  rows: string[];
+
+  constructor(
+    headers: string[],
+    parameters: CSVParameters = new CSVParameters(),
+  ) {
+    this.parameters = parameters;
+    this.rows = [this.parameters.row(headers)];
   }
 
   append(rows: any[]) {
     if (rows.length > 0) {
-      let r = rows.map((r) => this.encodeRow(r));
-      let s = r.join("\n");
-      this.rows = `${this.rows}\n${s}`;
+      let rs = rows.map((row) => this.parameters.row(row));
+      this.rows.push(...rs);
     }
   }
 
   get data() {
-    let h = this.encodeRow(this.headers);
-    let s = `${h}\n${this.rows}\n`;
-    return new Blob([s], {
+    return new Blob(this.rows, {
       type: "text/csv",
       endings: "native",
     });
@@ -56,7 +73,7 @@ function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-class Downloader {
+export class Downloader {
   blob: Blob;
   name: string;
 
@@ -67,11 +84,10 @@ class Downloader {
 
   async download() {
     let url = URL.createObjectURL(this.blob);
-    let anchor = new DOM("a")
-      .setAttrs({
-        href: url,
-        download: this.name
-      });
+    let anchor = new DOM("a").setAttrs({
+      href: url,
+      download: this.name,
+    });
 
     //document.body.appendChild(anchor.dom);
     anchor.click();
