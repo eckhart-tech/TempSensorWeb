@@ -16,7 +16,12 @@ export class Format {
 
   static date(d: Date | number): string {
     let e = (typeof d === "number") ? new Date(d) : d;
-    return this.formatter.format(d);
+    return this.formatter.format(e);
+  }
+
+  static jScriptDate(d: Date | number): string {
+    let e = (typeof d === "number") ? new Date(d) : d;
+    return e.toISOString().substring(0,10);
   }
 }
 

@@ -65,8 +65,8 @@ export class BeaconTable extends Table {
     throw new Error(`Unexpected event source ${e.target}`);
   }
 
-  constructor(title: string, klass: string, tag = "beacons") {
-    super(tag,klass, title);
+  constructor(id: string, title: string, klass: string) {
+    super(id,klass, title);
   }
 
 

@@ -1,25 +1,43 @@
 import { BaseRecord } from "./base";
 import { convert, Format } from "../../lib";
 
+export interface TimeRangeValues<T> {
+  start: T,
+  end: T
+};
+
 export class TimeRange extends BaseRecord {
   readonly start: Date;
   readonly end: Date;
-  constructor(start: number|string, end: number|string) {
+  constructor(start: number|string|null=null, end: number|string|null=null) {
     super();
-    this.start = convert(start).date;
-    this.end = convert(end).date;
+    this.start = (start == null) ? new Date(0) : convert(start).date;
+    this.end = (end == null) ? new Date() : convert(end).date;
   }
 
-  get timestamps() : number[] {
-    return [this.start.getTime(), this.end.getTime()];
+  get timestamps() : TimeRangeValues<number> {
+    return {
+      start: this.start.getTime(),
+      end: this.end.getTime()
+    };
   }
 
-  get dates() : Date[] {
-    return [this.start,this.end]
+  get dates() : TimeRangeValues<Date> {
+    return {
+      start: this.start,
+      end: this.end
+    };
+  }
+
+  get jScript() : TimeRangeValues<string> {
+    return {
+      start: Format.jScriptDate(this.start),
+      end: Format.jScriptDate(this.end)
+    };
   }
 
   get array() {
-    return this.dates.map(d => Format.date(d));
+    return [this.jScript.start,this.jScript.end];
   }
 
   get object() {
@@ -27,11 +45,14 @@ export class TimeRange extends BaseRecord {
   }
 
   get name(): string {
-    return "range";
+    let a = this.array
+    return `${a[0]}-${a[1]}`;
   }
 
 
+
+
   toString(): string {
-    return this.array.join(' ');
+    return this.name;
   }
 }

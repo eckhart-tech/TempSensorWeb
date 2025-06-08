@@ -21,11 +21,11 @@ export class RecordTable extends Table {
   ];
 
   constructor(
-    tag = "records",
+    id: string,
     klass: string = "rec",
     title: string | null = null,
   ) {
-    super(tag,klass, title);
+    super(id,klass, title);
   }
 
   callback(event: MouseEvent) {}

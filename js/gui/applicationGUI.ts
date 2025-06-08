@@ -2,12 +2,24 @@
 
 
 
-import { BaseRecord, BaseRecordSet, Beacon, Beacons, Records, beaconLoader, recordLoader } from "../sensors";
+import {
+  BaseRecord,
+  BaseRecordSet,
+  Beacon,
+  Beacons,
+  Records,
+  beaconLoader,
+  recordLoader,
+  TimeRanges,
+  rangeLoader
+} from "../sensors";
 import {BeaconEvent, BeaconTable, RecordTable} from './lists';
-import { ESSet } from "../lib/XSet";
+import { ESSet } from "../lib";
 import { Graphic } from "./graphs";
 import { GraphDataSet } from "./graphs/graphData";
-import { DOMButton } from "./dom";
+import { DOM, DOMButton } from "./dom";
+import { CSVData, Downloader } from "../lib/file";
+import { TimeRangeDisplay } from "./lists/TimeRangeDisplay";
 
 
 
@@ -45,17 +57,23 @@ export class ApplicationGUI {
   private extraBeacons : ExtraBeacons | null;
   private beaconTable : BeaconTable;
   private recordTable : RecordTable;
+  private rangeTable : TimeRangeDisplay;
   graphic : Graphic | null;
   controls: DOMButton;
+  timeRange : TimeRanges;
 
   constructor() {
     this.records = new Records();
     this.beacons = new Beacons();
+    this.timeRange = new TimeRanges();
+
+
+
     this.controls = new DOMButton('Download CSV','download');
 
-
-    this.beaconTable = new BeaconTable('Beacons','bcn-known');
-    this.recordTable = new RecordTable();
+    this.rangeTable = new TimeRangeDisplay('dates');
+    this.beaconTable = new BeaconTable('beacons','Beacons','bcn-known');
+    this.recordTable = new RecordTable('records');
   }
 
   /**
@@ -73,13 +91,22 @@ export class ApplicationGUI {
     await this.graphic.render(temps);
   }
 
-  download() {
+  async download() {
+    let csv = new CSVData(this.recordTable.Headers)
+    csv.append(this.records.items)
+    let d = new Downloader(csv.data,'records.csv');
+    await d.download();
+
     console.log('Callback for downloading CSV');
   }
 
   async load() {
+    this.timeRange = await rangeLoader();
     this.records = await recordLoader();
     this.beacons = await beaconLoader();
+
+    console.log(this.timeRange.toString(),this.timeRange.items[0].dates, this.timeRange.items[0].timestamps);
+    this.rangeTable.render(this.timeRange);
 
     this.extraBeacons = new ExtraBeacons(this.records,this.beacons);
     console.log('Extra',this.extraBeacons);
