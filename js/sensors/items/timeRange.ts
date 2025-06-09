@@ -1,4 +1,4 @@
-import { BaseRecord } from "./base";
+import { BaseRecord, Recordable } from "./base";
 import { convert, Format } from "../../lib";
 
 export interface TimeRangeValues<T> {
@@ -47,6 +47,10 @@ export class TimeRange extends BaseRecord {
   get name(): string {
     let a = this.array
     return `${a[0]}-${a[1]}`;
+  }
+
+  get raw(): Recordable[] {
+    return [this.start, this.end];
   }
 
 

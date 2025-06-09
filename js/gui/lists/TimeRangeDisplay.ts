@@ -13,10 +13,16 @@ export class TimeRangeDisplay extends GUIBase {
 
   private makeGUIForRange(range: TimeRange) : void {
     let jScript = range.jScript;
-    let title = new DOM('h1').text('Date range');
+
     let begin = new DOMInput(DOMInputType.DATE,'begin','start date').isImmutable(true).setDefault(jScript.start);
     let end = new DOMInput(DOMInputType.DATE,'end','end date').isImmutable(true).setDefault(jScript.end);
-    this.base.appendAll([title, begin.dom,end.dom]);
+    this.base.appendAll([
+      new DOM('h1').text('Date range'),
+      new DOM('nav').appendAll([
+        begin.dom,
+        end.dom
+      ])
+    ]);
   }
 
   render(...data : BaseRecordSet[]) {

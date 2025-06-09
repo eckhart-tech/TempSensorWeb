@@ -44,7 +44,7 @@ export interface GraphicConfiguration    {
 }
 
 
-
+// TODO add in plugin for zoom on graphs: chartjs-plugin-zoom: https://www.chartjs.org/chartjs-plugin-zoom/latest/guide/options.html
 function MakeGraphicConfiguration(data: GraphDataSet ,parameter:Parameter): GraphicConfiguration {
     let datasets = data.dataSet(parameter);
     let beacons = data.beacons.join(', ');

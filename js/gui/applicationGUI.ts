@@ -11,15 +11,15 @@ import {
   beaconLoader,
   recordLoader,
   TimeRanges,
-  rangeLoader
+  rangeLoader,
+  CSVData
 } from "../sensors";
-import {BeaconEvent, BeaconTable, RecordTable} from './lists';
-import { ESSet } from "../lib";
+import {BeaconEvent, BeaconTable, RecordTable, TimeRangeDisplay } from './lists';
+import { ESSet, Downloader } from "../lib";
 import { Graphic } from "./graphs";
 import { GraphDataSet } from "./graphs/graphData";
 import { DOM, DOMButton } from "./dom";
-import { CSVData, Downloader } from "../lib/file";
-import { TimeRangeDisplay } from "./lists/TimeRangeDisplay";
+
 
 
 
@@ -50,6 +50,7 @@ class ExtraBeacons extends BaseRecordSet {
   }
 }
 
+const SHOW_TABLE = false;
 
 export class ApplicationGUI {
   private records: Records;
@@ -85,15 +86,15 @@ export class ApplicationGUI {
 
     let filter = new ESSet(this.beaconTable.active.map(b => b.name));
     console.log('Payload is', filter, 'Table is', this.recordTable);
-    this.recordTable?.filter(filter);
+    if(SHOW_TABLE) { this.recordTable?.filter(filter); }
 
     let temps = new GraphDataSet(this.records,[...filter]);
     await this.graphic.render(temps);
   }
 
   async download() {
-    let csv = new CSVData(this.recordTable.Headers)
-    csv.append(this.records.items)
+    let csv = new CSVData(this.recordTable.Headers);
+    csv.append(this.records.items);
     let d = new Downloader(csv.data,'records.csv');
     await d.download();
 
@@ -116,7 +117,7 @@ export class ApplicationGUI {
 
 
     this.beaconTable.render(this.beacons,this.extraBeacons);
-    this.recordTable.render(this.records);
+    if(SHOW_TABLE) { this.recordTable.render(this.records); }
 
     this.controls.addListener(_ => this.download());
     this.controls.add('data');

@@ -1,4 +1,4 @@
-import { BaseRecord } from "./base";
+import { BaseRecord, Recordable } from "./base";
 
 export class Beacon extends BaseRecord {
   readonly name: string;
@@ -24,5 +24,14 @@ export class Beacon extends BaseRecord {
 
   get object() {
     return this;
+  }
+
+  get raw() : Recordable[] {
+    return [
+      this.name,
+      this.mac,
+      this.known,
+      this.count
+    ];
   }
 }

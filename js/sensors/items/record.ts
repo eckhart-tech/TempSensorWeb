@@ -1,4 +1,4 @@
-import { BaseRecord } from "./base";
+import { BaseRecord, Recordable } from "./base";
 import { convert } from "../../lib";
 
 
@@ -13,7 +13,6 @@ interface JSONRecord {
 }
 
 export class Record extends BaseRecord {
-
   valid: boolean;
   mac: string;
   sensor: string;
@@ -23,10 +22,7 @@ export class Record extends BaseRecord {
   humidity: number;
   battery: number;
 
-
-  constructor(
-    x : JSONRecord = {}
-  ) {
+  constructor(x: JSONRecord = {}) {
     super();
     this.valid = true;
     try {
@@ -41,22 +37,35 @@ export class Record extends BaseRecord {
       console.error(`Error : ${e.toString()}`);
       this.valid = false;
     }
-
   }
 
   get name(): string {
     return this.sensor;
   }
 
-
-
-
   toString(): string {
-    return '';
+    return "";
   }
 
   get array(): string[] {
-    return [this.sensor, this.mac, this.timestamp.toLocaleString(),
-      this.temperature.toFixed(2), this.humidity.toFixed(2), this.battery.toFixed(2)];
+    return [
+      this.sensor,
+      this.mac,
+      this.timestamp.toLocaleString(),
+      this.temperature.toFixed(2),
+      this.humidity.toFixed(2),
+      this.battery.toFixed(2),
+    ];
+  }
+
+  get raw(): Recordable[] {
+    return [
+      this.sensor,
+      this.mac,
+      this.timestamp,
+      this.temperature,
+      this.humidity,
+      this.battery
+    ];
   }
 }
