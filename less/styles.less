@@ -2,32 +2,22 @@
 @import "parts.less";
 
 body {
+  display: flex;
+  width: 100%;
+  margin: 0;
+  justify-content: flex-start;
+
   header {
-    #dates {
-      .dates;
-    }
     #beacons {
       .beacons;
     }
-    #data {
-      button {
-        width: 200px;
-        height: 100px;
-        background-color: greenyellow;
-        border-color: green;
-        border-radius: 16px;
-        .textFont;
-        font-weight: bold;
-        margin: 10px 50px;
-      }
+    #controls {
+      .controls;
     }
   }
 
   main {
-    display: flex;
-    width: 100%;
-    margin: 0;
-    justify-content: space-around;
+    flex-grow: 1;
 
     section#records {
       .records;
@@ -36,12 +26,5 @@ body {
     section#graph {
       .graph;
     }
-
   }
 }
-
-
-
-
-
-

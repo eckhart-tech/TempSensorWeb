@@ -7,14 +7,22 @@ export class Format {
   private readonly x: any;
 
   static {
-    this.formatter = new Intl.DateTimeFormat(navigator.language);
+    this.formatter = new Intl.DateTimeFormat(navigator.language, {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hourCycle: "h24"
+    });
   }
 
   static SetLocale(locale: string = 'en-GB') {
     this.formatter = new Intl.DateTimeFormat(locale);
   }
 
-  static date(d: Date | number): string {
+  static date(d: Date | number,long : boolean = false): string {
     let e = (typeof d === "number") ? new Date(d) : d;
     return this.formatter.format(e);
   }
@@ -59,6 +67,19 @@ export class Convert {
 
 export function convert(x: any) : Convert {
   return new Convert(x);
+}
+
+export function isNull(x: any) { return x==null; }
+export function isValid(x : any) : boolean {
+  return !(x===null || x=== undefined || Number.isNaN(x));
+}
+
+export function safeParseInt(x: string): number {
+  let nn = parseInt(x);
+  if (!isValid(nn)) {
+    throw new Error(`Bad tag value ${x}`);
+  }
+  return nn;
 }
 
 

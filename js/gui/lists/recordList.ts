@@ -1,9 +1,16 @@
 import { DOM } from "../dom";
-import { BaseRecord, Record } from "../../sensors";
+import { BaseRecord, Record, Records } from "../../sensors";
 import {Table} from './base';
 
 
-
+export const RecordHeaders : string[] = [
+  "Name",
+  "MAC",
+  "Time",
+  "Temperature (C)",
+  "Humidity (%)",
+  "Battery (%)",
+];
 
 
 export class RecordTable extends Table {
@@ -11,21 +18,12 @@ export class RecordTable extends Table {
   base: DOM;
   rows: Record[];
 
-  Headers = [
-    "Name",
-    "MAC",
-    "Time",
-    "Temperature (C)",
-    "Humidity (%)",
-    "Battery (%)",
-  ];
-
   constructor(
     id: string,
     klass: string = "rec",
     title: string | null = null,
   ) {
-    super(id,klass, title);
+    super(id,klass, title, RecordHeaders);
   }
 
   callback(event: MouseEvent) {}

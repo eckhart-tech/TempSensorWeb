@@ -15,7 +15,8 @@ class CSVParameters {
   }
 
   escape(str: string): string {
-    return str.replaceAll(this.quote, this.quoteReplace);
+    let e = str.replaceAll(this.quote, this.quoteReplace);
+    return `${this.quote}${e}${this.quote}`;
   }
 
   encode(value: any): string {
@@ -28,7 +29,7 @@ class CSVParameters {
         return this.escape(value);
       default:
         if (value instanceof Date) {
-          return Format.date(value);
+          return Format.date(value).replaceAll(',',' ');
         } else if (value == null) {
           return "";
         } else {
@@ -59,7 +60,6 @@ export class CSVData {
     this.rows = [this.parameters.row(headers)];
   }
 
-  // TODO Dates still rendering incorrectly
   append(rows: BaseRecord[]) {
     if (rows.length > 0) {
       let rs = rows.map((row) => this.parameters.record(row));
@@ -67,7 +67,7 @@ export class CSVData {
     }
   }
 
-  get data() {
+  get raw() {
     return new Blob(this.rows, {
       type: "text/csv",
       endings: "native",

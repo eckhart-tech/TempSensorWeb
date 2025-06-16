@@ -4,6 +4,109 @@ import { Format } from "../../lib";
 
 
 
+/*
+zoom: {
+
+            limits: {
+              x: { min: 'original', max: 'original' },
+              y: { min: 'original', max: 'original' },
+            },
+            zoom: {
+              wheel: {
+                enabled: true,
+                modifierKey: 'shift'
+              },
+              mode: 'xy'
+            }
+          }
+ */
+
+
+
+
+
+type ZoomRangeValue = number|'original';
+
+interface ZoomRange {
+  min: ZoomRangeValue,
+  max: ZoomRangeValue
+}
+
+type ZoomWheelModifierKey = 'ctrl'|'alt'|'shift'|'meta'|null;
+
+interface ZoomWheel {
+  enabled: boolean,
+  modifierKey?: ZoomWheelModifierKey
+}
+type ZoomMode = 'x'|'y'|'xy';
+
+interface ZoomPlugin {
+  pan? : {
+    enabled: boolean,
+    mode: ZoomMode
+  },
+  limits?: {
+    x : ZoomRange,
+    y : ZoomRange
+  },
+  zoom: {
+    wheel: ZoomWheel,
+    pinch: {
+      enabled: boolean
+    },
+    mode: ZoomMode;
+  }
+}
+
+function makeZoomRange(min : ZoomRangeValue, max : ZoomRangeValue) : ZoomRange {
+  return {
+    min: min,
+    max: max
+  };
+}
+
+function makeZoomWheel(enabled: boolean = false, key : ZoomWheelModifierKey = null) {
+  let w: ZoomWheel = {
+    enabled: enabled
+  };
+  if(enabled && key!=null) {
+    w.modifierKey=key;
+  }
+  return w;
+}
+
+export function makeZoomConfiguration(
+  mode: ZoomMode,
+  x: ZoomRange|null = null,
+  y: ZoomRange|null = null,
+  wheel: ZoomWheel|null = null,
+  pinch: boolean = false,
+  pan: boolean = false
+) : ZoomPlugin {
+  let z : ZoomPlugin = {
+    limits: {
+      x: x ?? makeZoomRange('original','original'),
+      y: y ?? makeZoomRange(0,100)
+    },
+    zoom: {
+      wheel: wheel ?? makeZoomWheel(),
+      pinch: {
+        enabled: pinch
+      },
+      mode: mode
+    }
+  };
+  if(pan) {
+    z.pan = {
+      enabled: true,
+      mode: mode
+    };
+  }
+  return z;
+}
+
+
+
 interface GraphicScale {
   beginAtZero?: boolean,
   min?: number,
@@ -24,6 +127,10 @@ export interface RecordItem {
   data: RecordValue[]
 }
 
+interface Plugins {
+  [index: string]: any
+}
+
 interface ChartConfig {
   type: ChartType,
   data: {
@@ -34,6 +141,7 @@ interface ChartConfig {
       x: GraphicScale,
       y: GraphicScale
     }
+    plugins: Plugins
   }
 }
 
@@ -44,11 +152,23 @@ export interface GraphicConfiguration    {
 }
 
 
+
+
+
+
 // TODO add in plugin for zoom on graphs: chartjs-plugin-zoom: https://www.chartjs.org/chartjs-plugin-zoom/latest/guide/options.html
-function MakeGraphicConfiguration(data: GraphDataSet ,parameter:Parameter): GraphicConfiguration {
+function MakeGraphicConfiguration(
+  data: GraphDataSet,
+  parameter:Parameter,
+  zoom: ZoomPlugin|null = null
+): GraphicConfiguration {
     let datasets = data.dataSet(parameter);
     let beacons = data.beacons.join(', ');
 
+    let plugins: Plugins = {};
+    if (zoom != null) {
+      plugins.zoom = zoom;
+    }
     let configuration : ChartConfig = {
       type: 'scatter',
       data: {
@@ -76,7 +196,8 @@ function MakeGraphicConfiguration(data: GraphDataSet ,parameter:Parameter): Grap
               }
             }
           }
-        }
+        },
+        plugins: plugins
       }
     };
     return {
@@ -87,5 +208,6 @@ function MakeGraphicConfiguration(data: GraphDataSet ,parameter:Parameter): Grap
 }
 
 export function  MakeGraphicConfigurations(data: GraphDataSet) : GraphicConfiguration[] {
-  return Parameter.All.map(p => MakeGraphicConfiguration(data,p));
+  let z = makeZoomConfiguration('x',null,null,makeZoomWheel(true),true,true);
+  return Parameter.All.map(p => MakeGraphicConfiguration(data,p,z));
 }

@@ -20,35 +20,30 @@ export abstract class GUIBase {
 
 export abstract class Table extends GUIBase {
 
-
-
   rows: BaseRecord[];
   table: DOMTableBase;
-
-  abstract Headers: string[];
-
-
-
+  Headers: string[];
 
   /**
    *
     * @param {string} id The ID of the HTML element to which the structure should be attached
    * @param klass The class (if any) to be attached to the object
    * @param title The title to attach to it
+   * @param headers Header names
    * @protected
    */
   protected constructor(
     id: string,
     klass: string,
-    title : string|null = null) {
+    title : string|null,
+    headers: string[]) {
     super(id,klass,title);
     this.rows = [];
     this.table = null;
-
+    this.Headers = headers;
   }
 
   abstract callback(event: MouseEvent): void;
-
   abstract makeRow(row: BaseRecord) : DOM[];
 
   render(...data: BaseRecordSet[]): void {
