@@ -1,3 +1,5 @@
+@import "media.less";
+
 .textFont(@size : 1em) {
   font-family: Arial, Helvetica, sans-serif;
   font-size: @size;
@@ -8,30 +10,30 @@
   font-size: @size;
 }
 
-.inputs(@bg : white) {
+.inputs() {
   margin: 2px;
   padding: 2px;
-  background-color: @bg;
+  .standard_colours;
 }
 
 
 
-.border(@on : true, @colour : black) {
+.border(@on : true) {
   border-style: if((@on = true), solid, none);
-  border-color: @colour;
+  .border_colours;
   border-width: 1px;
 }
 
-.table(@fontSize, @borderOn: true, @borderColour : true) {
+.table(@fontSize, @borderOn: true) {
   border-collapse: collapse;
-  .border(@borderOn, @borderColour);
+  .border(@borderOn);
   tr {
     &.hide {
       display: none;
     }
   }
   td, th {
-    .border(true, @borderColour);
+    .border(true);
     .textFont(@fontSize);
     padding: 0 4px 0 4px;
     text-align: center;

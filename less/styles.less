@@ -1,8 +1,11 @@
 @import "reset.less";
+@import "media.less";
 @import "parts.less";
 
 body {
+  .standard_colours;
   display: flex;
+  .flex_flow;
   width: 100%;
   margin: 0;
   justify-content: flex-start;
@@ -18,10 +21,6 @@ body {
 
   main {
     flex-grow: 1;
-
-    section#records {
-      .records;
-    }
 
     section#graph {
       .graph;
