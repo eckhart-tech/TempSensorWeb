@@ -1,5 +1,6 @@
 import { Record, Records } from "../../sensors";
-import { RecordItem, RecordValue } from "./configuration";
+import { RecordItem } from "./configuration";
+import { Point } from "chart.js";
 
 enum _Parameter {
   Temperature = "temperature",
@@ -79,7 +80,7 @@ export class GraphDataSet {
 
   dataSet(parameter: Parameter): RecordItem[] {
     return this.records.map((d) => {
-      let values: RecordValue[] = d.records.map((r) => {
+      let values: Point[] = d.records.map((r) => {
         return {
           x: r.timestamp.getTime(),
           y: r[parameter.parameter] as number,

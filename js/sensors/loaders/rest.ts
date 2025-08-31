@@ -1,4 +1,11 @@
-
+interface HTTPOptions {
+  method: string,
+  cache: string,
+  credentials?: string,
+  headers: Headers,
+  body?: string,
+  mode?: string
+}
 
 export const HTTPMethod = ((obj) => Object.freeze(obj)) ( {
     GET : 'GET',
@@ -23,25 +30,23 @@ export class HTTPRequest {
     });
   }
 
-  /**
-   *
-   * @param {string} method
-   * @param {object} data
-   * @returns {object}
-   */
+
   private options(
     method: string = HTTPMethod.GET,
     data: object = undefined,
-  ): object {
+    cors: boolean = true
+  ): RequestInit {
     let accept = method === HTTPMethod.POST ? "application/json" : "*/*";
     let hdr = this.headers();
     hdr.append("Accept", accept);
-    let opts = {
+    let opts : RequestInit = {
       method: method,
       cache: "no-cache",
-      credentials: "same-origin",
-      headers: hdr,
+      headers: hdr
     };
+    if(cors) {
+      opts.mode = 'cors';
+    }
     if (data !== undefined) {
       // @ts-ignore
       opts.body = JSON.stringify(data);
@@ -50,19 +55,14 @@ export class HTTPRequest {
     return opts;
   }
 
-  /**
-   *
-   * @param {URL} url
-   * @param {string} method
-   * @param {object} data
-   * @returns {Promise<any>}
-   */
+
   async handle(
     url: URL,
     method: string = HTTPMethod.GET,
     data: object = undefined,
+    cors: boolean = true
   ): Promise<any> {
-    let opts = this.options(method, data);
+    let opts = this.options(method, data, cors);
     const response = await fetch(url, opts);
     if (!response.ok) {
       throw new Error(`Network : ${response.status}`);

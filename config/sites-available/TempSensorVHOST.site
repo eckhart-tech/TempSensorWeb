@@ -1,0 +1,35 @@
+# Macro for standard directory permissions
+
+<Macro DirPermissions $dir>
+  <Directory "$dir">
+    <IfVersion < 2.4>
+                Order allow,deny
+                Allow from all
+            </IfVersion>
+            <IfVersion >= 2.4>
+                Require all granted
+            </IfVersion>
+  </Directory>
+</Macro>
+
+# VHost for the site
+
+<VirtualHost: *:80>
+    ServerName site.com
+    ServerAlias site.com
+    ServerAdmin webmaster@site.com
+
+    # static part
+    DocumentRoot /var/www/TempSensor
+    Alias /favicon.ico /var/www/TempSensor/favicon.ico
+    Alias / /var/www/TempSensor/
+    Use DirPermissions /var/www/TempSensor
+
+    # dynamic part
+    WSGIDaemonProcess site.com processes=2 threads=15 display-name=%{GROUP}
+    WSGIScriptAlias /data/ /opt/TempSensor/app.wsgi process-group=site.com
+    WSGIProcessGroup site.com
+    Use DirPermissions /opt/TempSensor
+</VirtualHost>
+
+UndefMacro DirPermissions
