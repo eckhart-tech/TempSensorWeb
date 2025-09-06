@@ -58,6 +58,8 @@ export class Graphic {
         new DOM("h1").text(c.title),
         canvas
       ]);
+    let cb = (event: Event) => { console.log(`Event {event} on chart`); }
+    canvas.dom.addEventListener('Mouse',cb,null)
     this.element.append(dom);
 
   }

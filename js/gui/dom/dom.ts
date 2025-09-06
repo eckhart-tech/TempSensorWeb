@@ -267,6 +267,14 @@ export class DOM {
     return this;
   }
 
+  removeEventListener(
+    event: string,
+    listener: EventListenerOrEventListenerObject,
+    options: boolean | EventListenerOptions = null,
+  ) {
+    this.element.removeEventListener(event,listener,options)
+  }
+
   /**
    * @desc Getter for data value (depending on control type)
    * @returns {*}
