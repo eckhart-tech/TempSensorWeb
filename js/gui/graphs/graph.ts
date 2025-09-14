@@ -17,7 +17,6 @@ import { GraphicConfiguration, MakeGraphicConfigurations } from "./configuration
 export class Graphic {
   static {
     Chart.register(zoomPlugin);
-    Chart.register(new Zoomer());
     Chart.defaults.animation = false;
     Chart.defaults.plugins.legend.display = true;
     Chart.defaults.plugins.title.display = false;

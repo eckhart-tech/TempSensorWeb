@@ -1,85 +1,75 @@
-import {
-  ChartType,
-  Plugin
-} from "chart.js";
+import { ChartMeta, ChartType } from "chart.js";
 import { Chart } from "chart.js/auto";
 import { getRelativePosition } from 'chart.js/helpers';
-import { Handlers, PluginEventHandlers } from "./pluginbase";
-
-
-
-type Obj<T> = Record<string,T>|null;
-
-class PluginBase implements Plugin {
-  id: string;
-  defaults? = {};
-  events?: (keyof HTMLElementEventMap)[];
-  chart: Chart | null = null;
-  handlers: PluginEventHandlers;
-
-  constructor(id: string) {
-    this.id = id;
-    this.handlers = new PluginEventHandlers();
-  }
-
-  init(chart: Chart<ChartType>, handlers: Handlers) {
-    this.chart = chart;
-    this.events = handlers.map((info) => info.event);
-    this.handlers.load(this.chart,handlers);
-  }
-
-}
+import { PluginBase, EventData, Obj, makePluginInterface } from "./pluginbase";
 
 
 
 export class Zoomer extends PluginBase {
-
   constructor() {
-    super('zoomer');
+    super("zoomer");
   }
 
-  afterInit(chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) {
-    this.init(chart,[
-      { event: 'pointerup', handler: this.pointerUpHandler },
-      { event: 'pointerdown', handler: this.pointerDownHandler }
-    ]);
-    console.log("Initialised zoomer");
-  }
 
-  pointerUpHandler(chart: Chart, event: Event) {
-    console.log(`Event is {event}`);
-    if (event.type === "pointerup") {
-      const canvasPosition = getRelativePosition(event, this.chart);
 
-      // Substitute the appropriate scale IDs
-      const dataX = this.chart.scales.x.getValueForPixel(canvasPosition.x);
-      const dataY = this.chart.scales.y.getValueForPixel(canvasPosition.y);
-
-      console.log(`Mouseup at ${dataX}, ${dataY}`);
+  pointerHandler(info: EventData) {
+    switch(info.action) {
+      case 'up':
+        this.pointerUp(info.raw);
+        break;
+      case 'down':
+        this.pointerDown(info.raw);
+        break;
+      case 'move':
+        break;
+      case 'cancel':
+        break;
+      case 'click':
+        break;
+      default:
+        break;
     }
   }
 
-  pointerDownHandler(chart: Chart, event: Event) {
-    console.log(`Event is {event}`);
-    if (event.type === "pointerdown") {
-      const canvasPosition = getRelativePosition(event, this.chart);
-
-      // Substitute the appropriate scale IDs
-      const dataX = this.chart.scales.x.getValueForPixel(canvasPosition.x);
-      const dataY = this.chart.scales.y.getValueForPixel(canvasPosition.y);
-
-      console.log(`Mousedown at ${dataX}, ${dataY}`);
+  keypressHandler(info: EventData) {
+    switch(info.action) {
+      case 'up':
+        break;
+      case 'down':
+        break;
+      default:
+        break;
     }
   }
 
+  pointerUp(event: Event) {
+    console.log(`Event is {event}`);
 
+    const canvasPosition = getRelativePosition(event, this.chart);
 
-  beforeDatasetsDraw(
-    chart: Chart<ChartType>,
-    args: { cancelable: true },
-    options: Obj<any>,
-  ): boolean | void {}
+    // Substitute the appropriate scale IDs
+    const dataX = this.chart.scales.x.getValueForPixel(canvasPosition.x);
+    const dataY = this.chart.scales.y.getValueForPixel(canvasPosition.y);
 
+    console.log(`Mouseup at ${dataX}, ${dataY}`);
 
+  }
+
+  pointerDown(event: Event) {
+    console.log(`Event is {event}`);
+    const canvasPosition = getRelativePosition(event, this.chart);
+
+    // Substitute the appropriate scale IDs
+    const dataX = this.chart.scales.x.getValueForPixel(canvasPosition.x);
+    const dataY = this.chart.scales.y.getValueForPixel(canvasPosition.y);
+
+    console.log(`Mousedown at ${dataX}, ${dataY}`);
+  }
 
 }
+
+let _zoomer = new Zoomer();
+export const zoomer = makePluginInterface(_zoomer);
+Chart.register(_zoomer);
+
+

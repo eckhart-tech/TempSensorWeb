@@ -4,9 +4,10 @@ export interface ZoomerOptions {
   mode: ZoomerMode
 }
 
-export function makeZoomerOptions() : ZoomerOptions {
-  return {
-    enabled: true,
-    mode: "xy"
-  };
-}
+export const zoomerOptionDefaults : ZoomerOptions = {
+  enabled: true,
+  mode: 'xy'
+};
+
+
+

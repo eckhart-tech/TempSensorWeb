@@ -1,50 +1,138 @@
 import { Chart } from "chart.js/auto";
-
-export type EventName = keyof HTMLElementEventMap;
-export type HandlerFunction = (chart: Chart, event: Event) => void;
-export interface HandlerInfo {
-
-  event: EventName,
-  handler: HandlerFunction
-}
-export type Handlers = Array<HandlerInfo>;
+import { ChartType, Plugin } from "chart.js";
+import { getRelativePosition } from "chart.js/helpers";
 
 
-export class PluginEventHandlers {
-  handlers: Map<EventName,EventListenerOrEventListenerObject>
+type EventKind = keyof HTMLElementEventMap;
+type EventAction = { [key: string]: EventKind[] };
+type EventEntry = [string, string[]];
 
-  constructor() {
-    this.handlers = new Map<EventName,EventListenerOrEventListenerObject>();
-  }
-
-  load(chart: Chart,handlers: Handlers) {
-    handlers.forEach(handler => this.add(chart,handler.event, handler.handler));
-  }
-  unload(chart: Chart,handlers: Handlers) {
-    handlers.forEach(handler => this.remove(chart,handler.event));
-  }
-
-
-
-  private add(chart: Chart,event: EventName, handler: HandlerFunction) {
-    this.remove(chart,event);
-
-    let listener: EventListenerOrEventListenerObject = (event : Event) => {
-      return handler(chart, event);
-    }
-    chart.ctx.canvas.addEventListener(event, listener);
-    this.handlers.set(event,listener);
-  }
-
-  private remove(chart: Chart,event: EventName) {
-    if(this.has(event)) {
-      let listener = this.handlers.get(event);
-      chart.ctx.canvas.removeEventListener(event,listener);
-      this.handlers.delete(event);
-    }
-  }
-
-  private has(event: EventName) : boolean { return this.handlers.has(event); }
+export interface EventData {
+  raw: Event,
+  event: string | null,
+  target: EventTarget,
+  action: string | null,
+  key?: string,
+  x?: number,
+  y?: number
 }
 
+export type Obj<T> = Record<string, T> | null;
+
+export class PluginBase implements Plugin {
+  id: string;
+  defaults? = {};
+  static EventEntries: EventEntry[];
+  static EventTranslation: EventAction = {
+    up: ["keyup", "mouseup", "pointerup", "touchend"],
+    down: ["keydown", "mousedown", "pointerdown", "touchstart"],
+    move: ["mousemove", "pointermove", "touchmove"],
+    cancel: ["mouseleave", "pointerleave", "pointercancel", "touchcancel"],
+    click: ["click"]
+  };
+  static EventList: EventKind[];
+  static {
+    PluginBase.EventEntries = Object.entries(PluginBase.EventTranslation);
+    PluginBase.EventList = [].concat(
+      ...PluginBase.EventEntries.map((value) => value[1])
+    );
+  }
+  events?: EventKind[];
+  chart: Chart | null = null;
+  canvas: HTMLCanvasElement | null = null;
+  activated: boolean;
+
+  constructor(id: string) {
+    this.id = id;
+    this.activated = false;
+  }
+
+  afterInit(chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) {
+    this.events = PluginBase.EventList;
+    this.chart = chart;
+    this.canvas = chart.ctx.canvas;
+    this.events.forEach((kind) => {
+      console.log(`Adding handler for event kind ${kind}`);
+      this.canvas.addEventListener(kind, (ev) => this.handler(ev));
+    });
+    this.activated = true;
+    console.log(`Initialised plugin ${this.id}`);
+  }
+
+  beforeDatasetsDraw(chart: Chart<ChartType>, args: { cancelable: true }, options: Obj<never>): boolean | void {
+    console.log(`Before draw ${this.id}`);
+  }
+
+  beforeDestroy(chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) {
+    if (!this.activated) {
+      return;
+    }
+    this.events.forEach((kind) => {
+      this.canvas.removeEventListener(kind, (ev) => this.handler(ev));
+    });
+    this.canvas = null;
+    this.chart = null;
+    this.activated = false;
+  }
+
+  translateEventKind(kind: string): string | null {
+    let translations: [string, string[]] | undefined =
+      PluginBase.EventEntries.find((value) => {
+        return value[1].includes(kind);
+      });
+    if (translations === undefined) {
+      return null;
+    }
+    return translations[0];
+  }
+
+  handler(event: Event) {
+    console.log(`In event handler, activated ${this.activated}, with event of type ${event.type} : ${event}  `);
+    if (!this.activated) {
+      return;
+    }
+    let translation: string | null = this.translateEventKind(event.type);
+    let source: RegExpMatchArray | null = event.type.match(
+      /^(key|mouse|pointer|touch).*/
+    );
+
+    let info: EventData = {
+      raw: event,
+      event: source == null ? null : source[1],
+      target: event.currentTarget,
+      action: translation
+    };
+
+    if (event instanceof KeyboardEvent) {
+      info.key = event.key;
+      this.keypressHandler(info);
+    } else if (
+      event instanceof PointerEvent ||
+      event instanceof MouseEvent ||
+      event instanceof TouchEvent
+    ) {
+      let pos = getRelativePosition(event, this.chart);
+      info.x = pos.x;
+      info.y = pos.y;
+      this.pointerHandler(info);
+    }
+  }
+
+  keypressHandler(info: EventData) {
+    console.log(info);
+  }
+
+  pointerHandler(info: EventData) {
+    console.log(info);
+  }
+}
+
+export function makePluginInterface(plugin: PluginBase): {} {
+  return {
+    id: plugin.id,
+    afterInit: (chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) => { plugin.afterInit(chart,args,options); },
+    beforeDatasetsDraw: (chart: Chart<ChartType>, args: { cancelable: true }, options: Obj<never>) => { plugin.beforeDatasetsDraw(chart,args,options); },
+    beforeDestroy: (chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) => { plugin.beforeDestroy(chart,args,options); }
+  };
+}
 
