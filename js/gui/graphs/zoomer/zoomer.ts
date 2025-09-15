@@ -1,30 +1,27 @@
-import { ChartMeta, ChartType } from "chart.js";
-import { Chart } from "chart.js/auto";
-import { getRelativePosition } from 'chart.js/helpers';
-import { PluginBase, EventData, Obj, makePluginInterface } from "./pluginbase";
-
-
+import { getRelativePosition } from "chart.js/helpers";
+import { EventData, PluginBase } from "./pluginbase";
+import { ZoomerEvent, ZoomerEventState, ZoomerEventTarget } from "./config";
 
 export class Zoomer extends PluginBase {
   constructor() {
     super("zoomer");
   }
 
-
-
   pointerHandler(info: EventData) {
-    switch(info.action) {
-      case 'up':
-        this.pointerUp(info.raw);
+    switch (info.action) {
+      case "up":
+        this.pointerAction(info.raw, ZoomerEventState.UP);
         break;
-      case 'down':
-        this.pointerDown(info.raw);
+      case "down":
+        this.pointerAction(info.raw, ZoomerEventState.DOWN);
         break;
-      case 'move':
+      case "move":
+        this.pointerAction(info.raw, ZoomerEventState.MOVING);
         break;
-      case 'cancel':
+      case "cancel":
+        this.pointerAction(info.raw, ZoomerEventState.NULL);
         break;
-      case 'click':
+      case "click":
         break;
       default:
         break;
@@ -32,44 +29,35 @@ export class Zoomer extends PluginBase {
   }
 
   keypressHandler(info: EventData) {
-    switch(info.action) {
-      case 'up':
+    switch (info.action) {
+      case "up":
         break;
-      case 'down':
+      case "down":
         break;
       default:
         break;
     }
   }
 
-  pointerUp(event: Event) {
-    console.log(`Event is {event}`);
+  private pointerAction(event: Event, state: ZoomerEventState) {
+    console.log(`Event is ${event}, state is ${state}`);
+    if (state === ZoomerEventState.NULL) {
+      console.log("CANCEL");
+      ZoomerEventTarget.dispatchEvent(new ZoomerEvent(ZoomerEventState.NULL));
+    }
+    else {
+      const canvasPosition = getRelativePosition(event, this.chart);
 
-    const canvasPosition = getRelativePosition(event, this.chart);
-
-    // Substitute the appropriate scale IDs
-    const dataX = this.chart.scales.x.getValueForPixel(canvasPosition.x);
-    const dataY = this.chart.scales.y.getValueForPixel(canvasPosition.y);
-
-    console.log(`Mouseup at ${dataX}, ${dataY}`);
-
-  }
-
-  pointerDown(event: Event) {
-    console.log(`Event is {event}`);
-    const canvasPosition = getRelativePosition(event, this.chart);
-
-    // Substitute the appropriate scale IDs
-    const dataX = this.chart.scales.x.getValueForPixel(canvasPosition.x);
-    const dataY = this.chart.scales.y.getValueForPixel(canvasPosition.y);
-
-    console.log(`Mousedown at ${dataX}, ${dataY}`);
+      // Substitute the appropriate scale IDs
+      const dataX = this.chart.scales.x.getValueForPixel(canvasPosition.x);
+      const dataY = this.chart.scales.y.getValueForPixel(canvasPosition.y);
+      console.log(`${event.type} at ${dataX}, ${dataY}`);
+      ZoomerEventTarget.dispatchEvent(new ZoomerEvent(state, "", dataX));
+    }
   }
 
 }
 
-let _zoomer = new Zoomer();
-export const zoomer = makePluginInterface(_zoomer);
-Chart.register(_zoomer);
+export const zoomer = new Zoomer();
 
 

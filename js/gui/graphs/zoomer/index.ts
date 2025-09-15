@@ -1,3 +1,3 @@
 export { zoomerOptionDefaults, ZoomerOptions } from "./config";
-export { Zoomer } from './zoomer';
+export { Zoomer, zoomer } from './zoomer';
 

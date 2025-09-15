@@ -1,13 +1,15 @@
 import { Chart } from 'chart.js/auto';
 //import { Chart, ScatterController, PointElement, LinearScale, Colors, Legend, Title } from "chart.js";
 import zoomPlugin from 'chartjs-plugin-zoom';
-import {Zoomer} from './zoomer';
+import { zoomer, Zoomer } from "./zoomer";
 
 
 import { DOM, DOMButton } from "../dom";
 import { GraphDataSet } from "./graphData";
 import { GraphicConfiguration, MakeGraphicConfigurations } from "./configuration";
+import { ZoomerEventTarget } from "./zoomer/config";
 
+Chart.register(new Zoomer());
 
 //Chart.register(
 //  ScatterController, PointElement, LinearScale, Colors, Legend, Title
@@ -16,23 +18,37 @@ import { GraphicConfiguration, MakeGraphicConfigurations } from "./configuration
 
 export class Graphic {
   static {
-    Chart.register(zoomPlugin);
+    Chart.register(zoomer);
     Chart.defaults.animation = false;
     Chart.defaults.plugins.legend.display = true;
     Chart.defaults.plugins.title.display = false;
   }
   element: DOM;
   charts: Chart[];
+  alive: boolean;
 
   constructor(id: string) {
     this.element = DOM.withID(id);
     this.charts = [];
+    this.alive = false;
+    ZoomerEventTarget.addEventListener('zoomer-event', e => this.zoomHandler(e));
 
   }
 
   clean() {
+    this.alive = false;
     this.charts = [];
     this.element.empty();
+
+  }
+
+  zoomHandler(e : Event) {
+    if(this.alive) {
+      console.log(`Got zoom-event ${e}`);
+    }
+    else {
+      console.log('dead graphic getting zoomer-event');
+    }
   }
 
   /*async renderParameter(data: GraphDataSet,parameter: Parameter) {
@@ -74,7 +90,7 @@ export class Graphic {
     for (const c of configurations) {
       await this.renderChart(c);
     }
-
+    this.alive=true;
   }
 
   reset() {

@@ -17,7 +17,19 @@ export interface EventData {
   y?: number
 }
 
+
+
 export type Obj<T> = Record<string, T> | null;
+
+interface IConstructor<T> {
+  new(...args: any[]) : T;
+}
+
+interface IActivatable {}
+
+function construct<T extends IActivatable>(type: IConstructor<T>) : T {
+  return new type();
+}
 
 export class PluginBase implements Plugin {
   id: string;
@@ -125,14 +137,18 @@ export class PluginBase implements Plugin {
   pointerHandler(info: EventData) {
     console.log(info);
   }
+
+  get pluginInterface(): {} {
+    return {
+      id: this.id,
+      afterInit: (chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) => { this.afterInit(chart,args,options); },
+      beforeDatasetsDraw: (chart: Chart<ChartType>, args: { cancelable: true }, options: Obj<never>) => { this.beforeDatasetsDraw(chart,args,options); },
+      beforeDestroy: (chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) => { this.beforeDestroy(chart,args,options); }
+    };
+  }
 }
 
-export function makePluginInterface(plugin: PluginBase): {} {
-  return {
-    id: plugin.id,
-    afterInit: (chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) => { plugin.afterInit(chart,args,options); },
-    beforeDatasetsDraw: (chart: Chart<ChartType>, args: { cancelable: true }, options: Obj<never>) => { plugin.beforeDatasetsDraw(chart,args,options); },
-    beforeDestroy: (chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) => { plugin.beforeDestroy(chart,args,options); }
-  };
-}
+
+
+
 
