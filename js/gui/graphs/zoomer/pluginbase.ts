@@ -21,16 +21,6 @@ export interface EventData {
 
 export type Obj<T> = Record<string, T> | null;
 
-interface IConstructor<T> {
-  new(...args: any[]) : T;
-}
-
-interface IActivatable {}
-
-function construct<T extends IActivatable>(type: IConstructor<T>) : T {
-  return new type();
-}
-
 export class PluginBase implements Plugin {
   id: string;
   defaults? = {};
@@ -138,6 +128,7 @@ export class PluginBase implements Plugin {
     console.log(info);
   }
 
+  /*
   get pluginInterface(): {} {
     return {
       id: this.id,
@@ -146,6 +137,7 @@ export class PluginBase implements Plugin {
       beforeDestroy: (chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) => { this.beforeDestroy(chart,args,options); }
     };
   }
+  */
 }
 
 

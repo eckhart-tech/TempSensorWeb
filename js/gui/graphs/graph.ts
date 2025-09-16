@@ -1,13 +1,12 @@
 import { Chart } from 'chart.js/auto';
 //import { Chart, ScatterController, PointElement, LinearScale, Colors, Legend, Title } from "chart.js";
-import zoomPlugin from 'chartjs-plugin-zoom';
+//import zoomPlugin from 'chartjs-plugin-zoom';
 import { zoomer, Zoomer } from "./zoomer";
 
 
 import { DOM, DOMButton } from "../dom";
 import { GraphDataSet } from "./graphData";
 import { GraphicConfiguration, MakeGraphicConfigurations } from "./configuration";
-import { ZoomerEventTarget } from "./zoomer/config";
 
 Chart.register(new Zoomer());
 
@@ -31,7 +30,6 @@ export class Graphic {
     this.element = DOM.withID(id);
     this.charts = [];
     this.alive = false;
-    ZoomerEventTarget.addEventListener('zoomer-event', e => this.zoomHandler(e));
 
   }
 
@@ -73,7 +71,7 @@ export class Graphic {
         new DOM("h1").text(c.title),
         canvas
       ]);
-    let cb = (event: Event) => { console.log(`Event {event} on chart`); }
+    let cb = (event: Event) => { console.log(`Event ${event} on chart`); }
     canvas.dom.addEventListener('Mouse',cb,null)
     this.element.append(dom);
 
@@ -94,7 +92,7 @@ export class Graphic {
   }
 
   reset() {
-    this.charts.forEach(c => c.resetZoom());
+    //this.charts.forEach(c => c.resetZoom());
   }
 }
 

@@ -1,10 +1,12 @@
-import { getRelativePosition } from "chart.js/helpers";
 import { EventData, PluginBase } from "./pluginbase";
-import { ZoomerEvent, ZoomerEventState, ZoomerEventTarget } from "./config";
+import { ZoomerEventState } from "./zoomerevents";
+import { ZoomerState } from "./zoomerevents";
 
 export class Zoomer extends PluginBase {
+  lastEvent : ZoomerState|null;
   constructor() {
     super("zoomer");
+    this.lastEvent = null;
   }
 
   pointerHandler(info: EventData) {
@@ -41,19 +43,37 @@ export class Zoomer extends PluginBase {
 
   private pointerAction(event: Event, state: ZoomerEventState) {
     console.log(`Event is ${event}, state is ${state}`);
-    if (state === ZoomerEventState.NULL) {
-      console.log("CANCEL");
-      ZoomerEventTarget.dispatchEvent(new ZoomerEvent(ZoomerEventState.NULL));
-    }
-    else {
-      const canvasPosition = getRelativePosition(event, this.chart);
+    let eventState = new ZoomerState(this.chart,event,state);
 
-      // Substitute the appropriate scale IDs
-      const dataX = this.chart.scales.x.getValueForPixel(canvasPosition.x);
-      const dataY = this.chart.scales.y.getValueForPixel(canvasPosition.y);
-      console.log(`${event.type} at ${dataX}, ${dataY}`);
-      ZoomerEventTarget.dispatchEvent(new ZoomerEvent(state, "", dataX));
+    switch(state) {
+      case ZoomerEventState.NULL:
+        console.log("CANCEL");
+        this.lastEvent=null;
+        break;
+      case ZoomerEventState.DOWN:
+        if(this.lastEvent===null) {
+          // TODO: draw start at eventState.position
+          this.lastEvent = eventState;
+          console.log(`DOWN ${event.type} at ${eventState.position.x}, ${eventState.position.y}`);
+        }
+        else {
+          console.log('Anomalous pointer down');
+        }
+        break;
+      case ZoomerEventState.UP:
+        if(this.lastEvent===null) {
+          console.log('Anomalous pointer down');
+        }
+        else {
+          // TODO: process zoom from this.lastEvent.position to eventState.position
+          this.lastEvent=null;
+          console.log(`UP ${event.type} at ${eventState.position.x}, ${eventState.position.y}`);
+        }
+        break;
+      default:
+        break;
     }
+
   }
 
 }
