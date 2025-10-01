@@ -16,6 +16,7 @@ export enum ZoomerEventState {
 
 
 
+
 function pointFromEvent(chart: Chart, event: Event): Point {
   const canvasPosition = getRelativePosition(event, chart);
 
@@ -38,6 +39,21 @@ export class ZoomerState {
     this.timestamp = event.timeStamp;
     this.position = (this.state===ZoomerEventState.NULL) ? null : pointFromEvent(chart,event);
   }
+
+  distance(other: ZoomerState) : number {
+    let p1=this.position;
+    let p2 = other.position;
+    if(p1===null || p2===null) { return NaN; }
+    return Math.hypot(p1.x-p2.x,p1.y-p2.y);
+  }
+  timeDelta(other: ZoomerState) : number {
+    return Math.abs(this.timestamp-other.timestamp)/1.0e6;
+  }
+
+  duplicates(other: ZoomerState) : boolean {
+    return this.state===other.state && this.distance(other)<1.0e6 && this.timeDelta(other) < 2.0e3;
+  }
+
 
   toString() : string {
     return `Position (${this.position?.x},${this.position?.y}) @ ${this.timestamp} : ${this.state} on ${this.target}`;

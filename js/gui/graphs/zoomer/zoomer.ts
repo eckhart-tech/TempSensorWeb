@@ -1,6 +1,8 @@
 import { EventData, PluginBase } from "./pluginbase";
 import { ZoomerEventState, ZoomerState } from "./zoomerevents";
 
+
+
 export class Zoomer extends PluginBase {
   lastEvent: ZoomerState | null;
   constructor() {
@@ -58,14 +60,9 @@ export class Zoomer extends PluginBase {
             `DOWN ${event.type} at ${eventState.position.x}, ${eventState.position.y} @ ${eventState.timestamp}`,
           );
         } else {
-          let d = Math.hypot(
-            eventState.position.x-this.lastEvent.position.x,
-            eventState.position.y-this.lastEvent.position.y
-            );
-          let delta = Math.abs(eventState.timestamp-this.lastEvent.timestamp)/1.0e6;
-          if(d>1.0e-6 || delta> 2.0e-3) {
+          if(eventState.duplicates(this.lastEvent)) {
             console.log(
-              `Anomalous DOWN ${event.type} at ${eventState.position.x}, ${eventState.position.y}  : dist = ${d}, time = ${delta}`,
+              `Anomalous DOWN ${event.type} at ${eventState.position.x}, ${eventState.position.y} `,
             );
           }
         }
