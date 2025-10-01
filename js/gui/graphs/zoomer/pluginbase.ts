@@ -57,9 +57,12 @@ export class PluginBase implements Plugin {
       console.log(`Adding handler for event kind ${kind}`);
       this.canvas.addEventListener(kind, (ev) => this.handler(ev));
     });
+    this.myInit();
     this.activated = true;
     console.log(`Initialised plugin ${this.id}`);
   }
+
+  myInit() {}
 
   beforeDatasetsDraw(chart: Chart<ChartType>, args: { cancelable: true }, options: Obj<never>): boolean | void {
     console.log(`Before draw ${this.id}`);
@@ -89,7 +92,7 @@ export class PluginBase implements Plugin {
   }
 
   handler(event: Event) {
-    console.log(`In event handler, activated ${this.activated}, with event of type ${event.type} : ${event}  `);
+    //console.log(`In event handler, activated ${this.activated}, with event of type ${event.type} : ${event}  `);
     if (!this.activated) {
       return;
     }

@@ -2,12 +2,19 @@ import { Point } from "chart.js";
 import { Chart } from "chart.js/auto";
 import { getRelativePosition } from "chart.js/helpers";
 
+
 export enum ZoomerEventState {
   NULL,
   DOWN,
   UP,
-  MOVING
+  MOVE,
+  NOTHING
 }
+
+
+
+
+
 
 function pointFromEvent(chart: Chart, event: Event): Point {
   const canvasPosition = getRelativePosition(event, chart);
@@ -30,6 +37,10 @@ export class ZoomerState {
     this.target = chart.ctx.canvas;
     this.timestamp = event.timeStamp;
     this.position = (this.state===ZoomerEventState.NULL) ? null : pointFromEvent(chart,event);
+  }
+
+  toString() : string {
+    return `Position (${this.position?.x},${this.position?.y}) @ ${this.timestamp} : ${this.state} on ${this.target}`;
   }
 }
 

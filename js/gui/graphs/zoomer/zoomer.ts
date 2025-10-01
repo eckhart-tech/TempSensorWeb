@@ -1,32 +1,32 @@
 import { EventData, PluginBase } from "./pluginbase";
-import { ZoomerEventState } from "./zoomerevents";
-import { ZoomerState } from "./zoomerevents";
+import { ZoomerEventState, ZoomerState } from "./zoomerevents";
 
 export class Zoomer extends PluginBase {
-  lastEvent : ZoomerState|null;
+  lastEvent: ZoomerState | null;
   constructor() {
     super("zoomer");
     this.lastEvent = null;
   }
 
+  myInit() {
+    super.myInit();
+    this.lastEvent = null;
+  }
+
   pointerHandler(info: EventData) {
-    switch (info.action) {
-      case "up":
-        this.pointerAction(info.raw, ZoomerEventState.UP);
-        break;
-      case "down":
-        this.pointerAction(info.raw, ZoomerEventState.DOWN);
-        break;
-      case "move":
-        this.pointerAction(info.raw, ZoomerEventState.MOVING);
-        break;
-      case "cancel":
-        this.pointerAction(info.raw, ZoomerEventState.NULL);
-        break;
-      case "click":
-        break;
-      default:
-        break;
+    let state : ZoomerEventState|null =
+      (info.action==="up") ? ZoomerEventState.UP :
+        (info.action==="down") ? ZoomerEventState.DOWN :
+          (info.action==="move") ? ZoomerEventState.MOVE :
+            (info.action==="cancel") ? ZoomerEventState.NULL :
+              (info.action==="click") ? ZoomerEventState.NOTHING :
+                null;
+    if(state!=null) {
+      this.pointerAction(info.raw,state);
+    }
+    else {
+      console.log(`Bad event ${info.action} : nulling`);
+      this.lastEvent=null;
     }
   }
 
@@ -42,40 +42,56 @@ export class Zoomer extends PluginBase {
   }
 
   private pointerAction(event: Event, state: ZoomerEventState) {
-    console.log(`Event is ${event}, state is ${state}`);
-    let eventState = new ZoomerState(this.chart,event,state);
+    let eventState = new ZoomerState(this.chart, event, state);
+    //console.log(`Event is ${event.type}, zoomerstate is ${eventState}`);
 
-    switch(state) {
+    switch (state) {
       case ZoomerEventState.NULL:
         console.log("CANCEL");
-        this.lastEvent=null;
+        this.lastEvent = null;
         break;
       case ZoomerEventState.DOWN:
-        if(this.lastEvent===null) {
+        if (this.lastEvent === null) {
           // TODO: draw start at eventState.position
           this.lastEvent = eventState;
-          console.log(`DOWN ${event.type} at ${eventState.position.x}, ${eventState.position.y}`);
-        }
-        else {
-          console.log('Anomalous pointer down');
+          console.log(
+            `DOWN ${event.type} at ${eventState.position.x}, ${eventState.position.y} @ ${eventState.timestamp}`,
+          );
+        } else {
+          let d = Math.hypot(
+            eventState.position.x-this.lastEvent.position.x,
+            eventState.position.y-this.lastEvent.position.y
+            );
+          let delta = Math.abs(eventState.timestamp-this.lastEvent.timestamp)/1.0e6;
+          if(d>1.0e-6 || delta> 2.0e-3) {
+            console.log(
+              `Anomalous DOWN ${event.type} at ${eventState.position.x}, ${eventState.position.y}  : dist = ${d}, time = ${delta}`,
+            );
+          }
         }
         break;
       case ZoomerEventState.UP:
-        if(this.lastEvent===null) {
-          console.log('Anomalous pointer down');
-        }
-        else {
+        if (this.lastEvent === null) {
+          //console.log("Anomalous pointer UP");
+        } else {
           // TODO: process zoom from this.lastEvent.position to eventState.position
-          this.lastEvent=null;
-          console.log(`UP ${event.type} at ${eventState.position.x}, ${eventState.position.y}`);
+          this.lastEvent = null;
+          console.log(
+            `UP ${event.type} at ${eventState.position.x}, ${eventState.position.y}`,
+          );
         }
         break;
+      case ZoomerEventState.MOVE:
+        if(this.lastEvent!==null) {
+          console.log(
+            `MOVE ${event.type} at ${eventState.position.x}, ${eventState.position.y}`,
+          );
+        }
       default:
+        //console.log(`Unexpected ${event.type} : ${eventState}`);
         break;
     }
-
   }
-
 }
 
 export const zoomer = new Zoomer();
