@@ -28,8 +28,6 @@ export enum EventSource {
   Pointer,
   Touch
 }
-
-
 export enum EventAction {
   Null,
   Down,
