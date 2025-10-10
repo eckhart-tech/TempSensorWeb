@@ -188,6 +188,14 @@ export class DOM {
     return this.element[name];
   }
 
+  setID(id: string) : DOM {
+    this.element.id=id;
+    return this;
+  }
+
+  getID() : string { return this.element.id; }
+
+
   /**
    *
    * @param {Array<string>} classes

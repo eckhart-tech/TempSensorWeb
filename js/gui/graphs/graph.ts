@@ -7,6 +7,8 @@ import { zoomer, Zoomer } from "./zoomer";
 import { DOM, DOMButton } from "../dom";
 import { GraphDataSet } from "./graphData";
 import { GraphicConfiguration, MakeGraphicConfigurations } from "./configuration";
+import { ZoomerEvent } from "./zoomer/zoomer";
+
 
 Chart.register(new Zoomer());
 
@@ -88,11 +90,18 @@ export class Graphic {
     for (const c of configurations) {
       await this.renderChart(c);
     }
+    this.element.addEventListener('zoomer-event',e => this.globalHandler(e));
     this.alive=true;
   }
 
   reset() {
     //this.charts.forEach(c => c.resetZoom());
+  }
+
+  globalHandler(event: Event) {
+    if(event instanceof ZoomerEvent) {
+      console.log(`>>> ZOOMER EVENT ${event}`);
+    }
   }
 }
 

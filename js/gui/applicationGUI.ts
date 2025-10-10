@@ -16,7 +16,8 @@ import { BeaconEvent, BeaconTable, RecordHeaders, RecordTable, TimeRangeDisplay 
 import { ESSet, Downloader } from "../lib";
 import { Graphic } from "./graphs";
 import { GraphDataSet } from "./graphs/graphData";
-import { DOMButton } from "./dom";
+import { DOM, DOMButton } from "./dom";
+
 
 
 

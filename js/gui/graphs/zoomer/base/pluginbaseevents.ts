@@ -1,8 +1,9 @@
 import { Chart } from "chart.js/auto";
 import { Point } from "chart.js";
 import { getRelativePosition } from "chart.js/helpers";
+import { EventKind } from "../../../dom";
 
-export type EventKind = keyof HTMLElementEventMap;
+
 export type EventTranslations = { [key: string]: EventKind[] };
 export type EventEntry = [string, string[]];
 
@@ -112,17 +113,15 @@ export class EventClassification {
 }
 
 export class PluginEvent extends Event {
-  readonly classification: EventClassification;
+  readonly action: EventAction;
 
-  constructor(event: EventClassification, type: string = 'plugin') {
+  constructor(action : EventAction,type: string = 'plugin') {
     super(`${type}-event`);
-    this.classification = event;
+    this.action=action;
   }
 }
 
-export function fire(event: EventClassification, target: Element, type: string = 'plugin') {
-  target.dispatchEvent(new PluginEvent(event,type));
-}
+
 
 export class Debouncer {
   private readonly distance : number;

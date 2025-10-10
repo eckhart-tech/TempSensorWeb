@@ -1,6 +1,7 @@
 import { Chart } from "chart.js/auto";
 import { ChartType, Plugin } from "chart.js";
-import { EventClass, EventClassification, EventKind, EventList } from "./pluginbaseevents";
+import { EventClass, EventClassification, EventList} from "./pluginbaseevents";
+import { EventKind } from "../../../dom";
 
 
 export interface EventData {
@@ -24,6 +25,7 @@ export class PluginBase implements Plugin {
   events?: EventKind[];
   chart: Chart | null = null;
   canvas: HTMLCanvasElement | null = null;
+  //element: HTMLElement | null = null;
   activated: boolean;
 
   constructor(id: string) {
@@ -42,6 +44,7 @@ export class PluginBase implements Plugin {
     this.myInit();
     this.activated = true;
     console.log(`Initialised plugin ${this.id}`);
+
   }
 
   myInit() {}
