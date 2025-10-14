@@ -1,7 +1,8 @@
-import { Chart } from "chart.js/auto";
+import { Chart, ChartEvent, ChartMeta, ChartTypeRegistry } from "chart.js/auto";
 import { ChartType, Plugin } from "chart.js";
-import { EventClass, EventClassification, EventList} from "./pluginbaseevents";
+import { EventClass, EventClassification, EventList, PluginEvent } from "./pluginbaseevents";
 import { EventKind } from "../../../dom";
+
 
 
 export interface EventData {
@@ -17,10 +18,32 @@ export interface EventData {
 
 
 export type Obj<T> = Record<string, T> | null;
+e
+
+
+
+
+export interface AfterEventArgs {
+  event: ChartEvent;
+  replay: boolean;
+  changed?: boolean;
+  cancelable: false;
+  inChartArea: boolean;
+}
+export function afterEvent(event : PluginEvent, rep : boolean = false, area: boolean = true) : AfterEventArgs {
+  return {
+    event: event.wrap(),
+    replay: rep,
+    inChartArea : area,
+    cancelable: false
+  };
+}
 
 export class PluginBase implements Plugin {
   id: string;
   defaults? = {};
+  args: Obj<never>;
+  options: Obj<any>;
 
   events?: EventKind[];
   chart: Chart | null = null;
@@ -41,15 +64,16 @@ export class PluginBase implements Plugin {
       console.log(`Adding handler for event kind ${kind}`);
       this.canvas.addEventListener(kind, (ev) => this.handler(ev));
     });
+    this.args = args;
+    this.options = options;
     this.myInit();
     this.activated = true;
     console.log(`Initialised plugin ${this.id}`);
-
   }
 
   myInit() {}
 
-  beforeDatasetsDraw(chart: Chart<ChartType>, args: { cancelable: true }, options: Obj<never>): boolean | void {
+  beforeDatasetsDraw(chart: Chart<ChartType>, args = {  cancelable: false }, options: Obj<never>): boolean | void {
     console.log(`Before draw ${this.id}`);
   }
 
@@ -65,15 +89,25 @@ export class PluginBase implements Plugin {
     this.activated = false;
   }
 
+  afterEvent(chart: Chart<ChartType>, args: AfterEventArgs, options: Obj<any>,
+  ) {
+    let e = args.event.native;
+    if(e!= null && e instanceof PluginEvent) {
+      args.changed = this.myChartEventHandler(chart, e);
+    }
+  }
 
+  myChartEventHandler(chart: Chart<ChartType>,event: PluginEvent) : boolean {
+    return false;
+  }
 
   handler(event: Event) {
     //console.log(`In event handler, activated ${this.activated}, with event of type ${event.type} : ${event}  `);
     if (!this.activated) {
       return;
     }
-    let classification = new EventClassification(event,this.chart);
-    switch(classification.eventClass) {
+    let classification = new EventClassification(event, this.chart);
+    switch (classification.eventClass) {
       case EventClass.Keyboard:
         this.keypressHandler(classification);
         break;
@@ -86,7 +120,6 @@ export class PluginBase implements Plugin {
       default:
         break;
     }
-
   }
 
   clickHandler(info: EventClassification) {

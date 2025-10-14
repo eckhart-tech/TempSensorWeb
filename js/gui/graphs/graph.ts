@@ -10,7 +10,7 @@ import { GraphicConfiguration, MakeGraphicConfigurations } from "./configuration
 import { ZoomerEvent } from "./zoomer/zoomer";
 
 
-Chart.register(new Zoomer());
+Chart.register(zoomer);
 
 //Chart.register(
 //  ScatterController, PointElement, LinearScale, Colors, Legend, Title
@@ -85,12 +85,11 @@ export class Graphic {
     reset.addListener(_ => { this.reset(); });
     this.element.append(reset.dom);
 
-    let configurations = MakeGraphicConfigurations(data);
+    let configurations = MakeGraphicConfigurations(data,this.element);
     console.log(configurations);
     for (const c of configurations) {
       await this.renderChart(c);
     }
-    this.element.addEventListener('zoomer-event',e => this.globalHandler(e));
     this.alive=true;
   }
 
@@ -101,6 +100,10 @@ export class Graphic {
   globalHandler(event: Event) {
     if(event instanceof ZoomerEvent) {
       console.log(`>>> ZOOMER EVENT ${event}`);
+      let ce = event.wrap();
+      this.charts.forEach(chart => {
+        chart.notifyPlugins('afterEvent',{ event: ce });
+      });
     }
   }
 }

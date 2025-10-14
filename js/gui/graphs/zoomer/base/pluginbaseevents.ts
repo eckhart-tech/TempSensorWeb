@@ -1,5 +1,5 @@
 import { Chart } from "chart.js/auto";
-import { Point } from "chart.js";
+import { Point, ChartEvent } from "chart.js";
 import { getRelativePosition } from "chart.js/helpers";
 import { EventKind } from "../../../dom";
 
@@ -114,12 +114,29 @@ export class EventClassification {
 
 export class PluginEvent extends Event {
   readonly action: EventAction;
+  readonly chart: Chart | null;
 
-  constructor(action : EventAction,type: string = 'plugin') {
+  constructor(
+    action: EventAction,
+    chart: Chart | null = null,
+    type: string = "plugin",
+  ) {
     super(`${type}-event`);
-    this.action=action;
+    this.chart = chart;
+    this.action = action;
+  }
+
+  wrap() : ChartEvent {
+    return {
+      type: "click",
+      native: this,
+      x: null,
+      y: null
+    };
   }
 }
+
+
 
 
 

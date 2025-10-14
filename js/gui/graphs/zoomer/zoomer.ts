@@ -1,7 +1,8 @@
 import { PluginBase } from "./base/pluginbase";
 import { Debouncer, EventAction, EventClassification, PluginEvent } from "./base/pluginbaseevents";
-import { Point } from "chart.js";
-import { GeneralEventTarget } from "../../dom";
+import { ChartType, Point } from "chart.js";
+import { DOM, GeneralEventTarget } from "../../dom";
+import { Chart, ChartEvent } from "chart.js/auto";
 
 
 export class ZoomerEvent extends PluginEvent {
@@ -9,14 +10,14 @@ export class ZoomerEvent extends PluginEvent {
   p2: Point|null;
 
   constructor(action: EventAction,p1: Point|null, p2: Point|null) {
-    super(action,'zoomer');
+    super(action,null, 'zoomer');
     this.p1=p1;
     this.p2=p2;
 
   }
 
   toString() : string {
-    return `ACTION ${this.action} P1 ${this.p1} P2 ${this.p2}`;
+    return `TYPE ${this.type} ACTION ${this.action} P1 ${this.p1} P2 ${this.p2}`;
   }
 }
 
@@ -26,18 +27,25 @@ export class Zoomer extends PluginBase {
   startEvent: EventClassification | null;
   lastEvent: EventClassification | null;
   debouncer: Debouncer = new Debouncer();
-  element : HTMLElement|null;
+  element: DOM | null;
   constructor() {
     super("zoomer");
     this.lastEvent = null;
   }
 
-
-
   myInit() {
     super.myInit();
     this.nullEvents();
-    this.element=this.canvas.parentElement;
+    let e = this.options.element;
+    if (e != null) {
+      this.element = e as DOM;
+    }
+
+  }
+
+  myChartEventHandler(chart: Chart<ChartType>, event: PluginEvent): boolean {
+    console.log(`>>> CHART ${chart} GLOBAL ZOOMER EVENT: ${event}`);
+    return true;
   }
 
   pointerHandler(info: EventClassification) {
@@ -61,18 +69,26 @@ export class Zoomer extends PluginBase {
   }
 
   private nullEvents() {
-    this.startEvent=null;
-    this.lastEvent=null;
+    this.startEvent = null;
+    this.lastEvent = null;
   }
 
-  private fireEvent(action: EventAction,e1: EventClassification|null=null,e2: EventClassification|null = null) {
-    let e = new ZoomerEvent(action, e1?.position, e2?.position);
-    this.element?.dispatchEvent(e);
+  private fireEvent(
+    action: EventAction,
+    e1: EventClassification | null = null,
+    e2: EventClassification | null = null,
+  ) {
+    this.element?.fire(new ZoomerEvent(action, e1?.position, e2?.position));
   }
 
   private pointerAction(event: EventClassification) {
-    if((this.lastEvent!=null) && this.debouncer.duplicate(event,this.lastEvent)) {
-      console.log(`DUPLICATE ${event.eventType} at ${event.position.x}, ${event.position.y} `);
+    if (
+      this.lastEvent != null &&
+      this.debouncer.duplicate(event, this.lastEvent)
+    ) {
+      console.log(
+        `DUPLICATE ${event.eventType} at ${event.position.x}, ${event.position.y} `,
+      );
       return;
     }
     switch (event.action) {
@@ -87,7 +103,7 @@ export class Zoomer extends PluginBase {
           // TODO: draw start at eventState.position: startEvent
           this.startEvent = event;
           this.lastEvent = event;
-          this.fireEvent(EventAction.Down,this.startEvent);
+          this.fireEvent(EventAction.Down, this.startEvent);
           console.log(
             `DOWN ${event.eventType} at ${event.position.x}, ${event.position.y} @ ${event.timestamp}`,
           );
@@ -97,7 +113,7 @@ export class Zoomer extends PluginBase {
         if (this.startEvent === null) {
           //console.log("Anomalous pointer UP");
         } else {
-          this.fireEvent(EventAction.Up,this.startEvent,event)
+          this.fireEvent(EventAction.Up, this.startEvent, event);
 
           console.log(
             `UP ${event.eventType} at ${event.position.x}, ${event.position.y}`,
@@ -111,10 +127,8 @@ export class Zoomer extends PluginBase {
             `MOVE ${event.eventType} at ${event.position.x}, ${event.position.y}`,
           );
           // TODO" move : lastEvent and event
-          this.fireEvent(EventAction.Move,event,this.lastEvent);
-          this.lastEvent=event;
-
-
+          this.fireEvent(EventAction.Move, event, this.lastEvent);
+          this.lastEvent = event;
         }
         break;
       default:
@@ -123,9 +137,7 @@ export class Zoomer extends PluginBase {
     }
   }
 
-  globalEvent(event: ZoomerEvent) {
-    console.log(`>>> GLOBAL ZOOMER EVENT: {event}`)
-  }
+
 }
 
 export const zoomer = new Zoomer();

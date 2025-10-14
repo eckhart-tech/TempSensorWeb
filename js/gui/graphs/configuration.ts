@@ -3,7 +3,8 @@ import { GraphDataSet, Parameter } from "./graphData";
 import { Format } from "../../lib";
 
 import { GraphicScale, Plugins, EventKey, ZoomPlugin, makeZoomConfiguration, makeZoomWheel } from "./conf";
-import { zoomerOptionDefaults, ZoomerOptions } from "./zoomer";
+import { zoomerOptions, ZoomerOptions } from "./zoomer";
+import { DOM } from "../dom";
 
 
 /*
@@ -138,7 +139,7 @@ function MakeGraphicConfiguration(
   };
 }
 
-export function  MakeGraphicConfigurations(data: GraphDataSet) : GraphicConfiguration[] {
+export function  MakeGraphicConfigurations(data: GraphDataSet,element: DOM|null=null) : GraphicConfiguration[] {
   //let z = makeZoomConfiguration('x',null,null,makeZoomWheel(true),true,true);
-  return Parameter.All.map(p => MakeGraphicConfiguration(data,p,zoomerOptionDefaults));
+  return Parameter.All.map(p => MakeGraphicConfiguration(data,p,zoomerOptions(element)));
 }
