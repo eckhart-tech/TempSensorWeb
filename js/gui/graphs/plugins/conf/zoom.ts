@@ -6,12 +6,31 @@ interface ZoomRange {
   max: ZoomRangeValue
 }
 
+export function makeZoomRange(min : ZoomRangeValue, max : ZoomRangeValue) : ZoomRange {
+  return {
+    min: min,
+    max: max
+  };
+}
+
 type ZoomWheelModifierKey = 'ctrl'|'alt'|'shift'|'meta'|null;
 
 interface ZoomWheel {
   enabled: boolean,
   modifierKey?: ZoomWheelModifierKey
 }
+
+export function makeZoomWheel(enabled: boolean = false, key : ZoomWheelModifierKey = null) {
+  let w: ZoomWheel = {
+    enabled: enabled
+  };
+  if(enabled && key!=null) {
+    w.modifierKey=key;
+  }
+  return w;
+}
+
+
 type ZoomMode = 'x'|'y'|'xy';
 
 export interface ZoomPlugin {
@@ -30,23 +49,6 @@ export interface ZoomPlugin {
     },
     mode: ZoomMode;
   }
-}
-
-export function makeZoomRange(min : ZoomRangeValue, max : ZoomRangeValue) : ZoomRange {
-  return {
-    min: min,
-    max: max
-  };
-}
-
-export function makeZoomWheel(enabled: boolean = false, key : ZoomWheelModifierKey = null) {
-  let w: ZoomWheel = {
-    enabled: enabled
-  };
-  if(enabled && key!=null) {
-    w.modifierKey=key;
-  }
-  return w;
 }
 
 export function makeZoomConfiguration(
@@ -78,4 +80,3 @@ export function makeZoomConfiguration(
   }
   return z;
 }
-

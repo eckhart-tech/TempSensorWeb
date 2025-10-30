@@ -112,18 +112,12 @@ export class EventClassification {
   }
 }
 
-export class PluginEvent extends Event {
-  readonly action: EventAction;
-  readonly chart: Chart | null;
 
-  constructor(
-    action: EventAction,
-    chart: Chart | null = null,
-    type: string = "plugin",
-  ) {
+export class PluginEvent extends Event {
+  action: EventAction;
+  constructor(action: EventAction, type: string = 'plugin') {
     super(`${type}-event`);
-    this.chart = chart;
-    this.action = action;
+    this.action=action;
   }
 
   wrap() : ChartEvent {
@@ -134,7 +128,13 @@ export class PluginEvent extends Event {
       y: null
     };
   }
+
+
 }
+
+
+
+
 
 
 

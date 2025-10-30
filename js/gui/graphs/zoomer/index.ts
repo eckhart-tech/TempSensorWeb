@@ -1,3 +1,3 @@
-export { zoomerOptions, ZoomerOptions } from "./config";
+export { zoomerOptions, ZoomerOptions } from "../plugins/conf/zoomer";
 export { Zoomer, zoomer } from './zoomer';
 

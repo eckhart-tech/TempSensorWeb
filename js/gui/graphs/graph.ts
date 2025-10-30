@@ -1,25 +1,24 @@
-import { Chart } from 'chart.js/auto';
+import { Chart, ChartItem } from "chart.js/auto";
 //import { Chart, ScatterController, PointElement, LinearScale, Colors, Legend, Title } from "chart.js";
 //import zoomPlugin from 'chartjs-plugin-zoom';
-import { zoomer, Zoomer } from "./zoomer";
+//import { Zoomer } from "./zoomer";
 
 
 import { DOM, DOMButton } from "../dom";
 import { GraphDataSet } from "./graphData";
-import { GraphicConfiguration, MakeGraphicConfigurations } from "./configuration";
-import { ZoomerEvent } from "./zoomer/zoomer";
+import { ChartConfig, GraphicConfiguration } from "./base";
+//import { ZoomerEvent } from "./zoomer/zoomer";
+import { MakeGraphicConfigurations } from "./configuration";
 
 
-Chart.register(zoomer);
 
-//Chart.register(
-//  ScatterController, PointElement, LinearScale, Colors, Legend, Title
-//);
+
 
 
 export class Graphic {
+  //static zoomer = new Zoomer();
   static {
-    Chart.register(zoomer);
+    //Chart.register(Graphic.zoomer);
     Chart.defaults.animation = false;
     Chart.defaults.plugins.legend.display = true;
     Chart.defaults.plugins.title.display = false;
@@ -42,6 +41,7 @@ export class Graphic {
 
   }
 
+  /*
   zoomHandler(e : Event) {
     if(this.alive) {
       console.log(`Got zoom-event ${e}`);
@@ -50,6 +50,8 @@ export class Graphic {
       console.log('dead graphic getting zoomer-event');
     }
   }
+  */
+
 
   /*async renderParameter(data: GraphDataSet,parameter: Parameter) {
       this.clean();
@@ -67,14 +69,15 @@ export class Graphic {
 
   async renderChart(c : GraphicConfiguration) {
     let canvas = new DOM("canvas").addClass(c.klass);
-    this.charts.push(new Chart(canvas.dom as HTMLCanvasElement, c.configuration));
+    let chart = new Chart(canvas.dom as HTMLCanvasElement, c.configuration);
+    this.charts.push(chart);
     let dom = new DOM("figure")
       .appendAll([
         new DOM("h1").text(c.title),
         canvas
       ]);
-    let cb = (event: Event) => { console.log(`Event ${event} on chart`); }
-    canvas.dom.addEventListener('Mouse',cb,null)
+    //let cb = (event: Event) => { console.log(`Event ${event} on chart`); }
+    //canvas.dom.addEventListener('Mouse',cb,null)
     this.element.append(dom);
 
   }
@@ -84,8 +87,9 @@ export class Graphic {
     let reset = new DOMButton('Reset Zoom');
     reset.addListener(_ => { this.reset(); });
     this.element.append(reset.dom);
+    // this.element.addEventListener('zoomer-event', e => this.globalHandler(e));
 
-    let configurations = MakeGraphicConfigurations(data,this.element);
+    let configurations = MakeGraphicConfigurations('scatter',data,this.element);
     console.log(configurations);
     for (const c of configurations) {
       await this.renderChart(c);
@@ -97,6 +101,7 @@ export class Graphic {
     //this.charts.forEach(c => c.resetZoom());
   }
 
+  /*
   globalHandler(event: Event) {
     if(event instanceof ZoomerEvent) {
       console.log(`>>> ZOOMER EVENT ${event}`);
@@ -106,6 +111,8 @@ export class Graphic {
       });
     }
   }
+  */
+
 }
 
 

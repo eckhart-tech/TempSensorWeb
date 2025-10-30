@@ -1,4 +1,4 @@
-import { PluginBase } from "./base/pluginbase";
+import { Obj, PluginBase } from "./base/pluginbase";
 import { Debouncer, EventAction, EventClassification, PluginEvent } from "./base/pluginbaseevents";
 import { ChartType, Point } from "chart.js";
 import { DOM, GeneralEventTarget } from "../../dom";
@@ -10,7 +10,7 @@ export class ZoomerEvent extends PluginEvent {
   p2: Point|null;
 
   constructor(action: EventAction,p1: Point|null, p2: Point|null) {
-    super(action,null, 'zoomer');
+    super(action,'zoomer-event');
     this.p1=p1;
     this.p2=p2;
 
@@ -28,24 +28,36 @@ export class Zoomer extends PluginBase {
   lastEvent: EventClassification | null;
   debouncer: Debouncer = new Debouncer();
   element: DOM | null;
+
   constructor() {
     super("zoomer");
     this.lastEvent = null;
   }
 
-  myInit() {
-    super.myInit();
+  myInit(chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) {
+    super.myInit(chart, args, options);
     this.nullEvents();
     let e = this.options.element;
     if (e != null) {
       this.element = e as DOM;
     }
+  }
 
+  afterDraw(chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) {
+    super.afterDraw(chart, args, options);
+    if(this.startEvent!=null && this.lastEvent!=null) {
+      chart.ctx.fillRect(this.startEvent.)
+    }
   }
 
   myChartEventHandler(chart: Chart<ChartType>, event: PluginEvent): boolean {
-    console.log(`>>> CHART ${chart} GLOBAL ZOOMER EVENT: ${event}`);
-    return true;
+    if (event instanceof ZoomerEvent) {
+      console.log(`>>> CHART ${chart} GLOBAL ZOOMER EVENT: ${event}`);
+      return true;
+    } else {
+      console.log(`>>> CHART ${chart} NOT A GLOBAL ZOOMER EVENT: ${event}`);
+      return false;
+    }
   }
 
   pointerHandler(info: EventClassification) {
@@ -136,8 +148,6 @@ export class Zoomer extends PluginBase {
         break;
     }
   }
-
-
 }
 
 export const zoomer = new Zoomer();
