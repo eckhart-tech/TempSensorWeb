@@ -1,5 +1,5 @@
 import { Record, Records } from "../../sensors";
-import { RecordItem } from "./configuration";
+import { RecordItem } from "./base";
 import { Point } from "chart.js";
 
 enum _Parameter {
