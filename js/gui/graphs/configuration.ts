@@ -5,6 +5,7 @@ import { Format } from "../../lib";
 import { GraphicScale, Plugins, EventKey, ZoomPlugin, makeZoomConfiguration, makeZoomWheel } from "./conf";
 import { zoomerOptions, ZoomerOptions } from "./zoomer";
 import { DOM } from "../dom";
+import { DateAxisScaler, UnitAxisScaler } from "./conf/graph_scale";
 
 
 /*
@@ -81,26 +82,8 @@ function MakeGraphicOptions(
 ) : GraphicOptions {
   return {
     scales: {
-      x: {
-        beginAtZero: false,
-        //min: data.min.getTime(),
-        //max: data.max.getTime(),
-        ticks: {
-          callback: function(value, index, ticks) {
-            return Format.date(value);
-          }
-        }
-      },
-      y: {
-        beginAtZero: false,
-        //min: parameter.min,
-        //max: parameter.max,
-        ticks: {
-          callback: function(value, index, ticks) {
-            return `${value}${parameter.units}`;
-          }
-        }
-      }
+      x: new DateAxisScaler().scale,
+      y: new UnitAxisScaler(parameter.units).scale
     },
     events: events,
     plugins: plugins

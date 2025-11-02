@@ -18,7 +18,7 @@ export interface EventData {
 
 
 export type Obj<T> = Record<string, T> | null;
-e
+
 
 
 
@@ -46,8 +46,7 @@ export class PluginBase implements Plugin {
   options: Obj<any>;
 
   events?: EventKind[];
-  chart: Chart | null = null;
-  canvas: HTMLCanvasElement | null = null;
+
   //element: HTMLElement | null = null;
   activated: boolean;
 
@@ -58,11 +57,10 @@ export class PluginBase implements Plugin {
 
   afterInit(chart: Chart<ChartType>, args: Obj<never>, options: Obj<any>) {
     this.events = EventList;
-    this.chart = chart;
-    this.canvas = chart.ctx.canvas;
+
     this.events.forEach((kind) => {
       console.log(`Adding handler for event kind ${kind}`);
-      this.canvas.addEventListener(kind, (ev) => this.handler(ev));
+      chart.ctx.canvas.addEventListener(kind, (ev) => this.handler(ev,chart));
     });
     this.args = args;
     this.options = options;
@@ -82,10 +80,8 @@ export class PluginBase implements Plugin {
       return;
     }
     this.events.forEach((kind) => {
-      this.canvas.removeEventListener(kind, (ev) => this.handler(ev));
+      chart.ctx.canvas.removeEventListener(kind, (ev) => this.handler(ev,chart));
     });
-    this.canvas = null;
-    this.chart = null;
     this.activated = false;
   }
 
@@ -101,12 +97,12 @@ export class PluginBase implements Plugin {
     return false;
   }
 
-  handler(event: Event) {
+  handler(event: Event, chart: Chart<ChartType>) {
     //console.log(`In event handler, activated ${this.activated}, with event of type ${event.type} : ${event}  `);
     if (!this.activated) {
       return;
     }
-    let classification = new EventClassification(event, this.chart);
+    let classification = new EventClassification(event, chart);
     switch (classification.eventClass) {
       case EventClass.Keyboard:
         this.keypressHandler(classification);
