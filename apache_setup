@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+function stop {
+  systemctl apache2 stop
+}
+
+function start {
+  systemctl apache2 start
+}
+
+function apache_server_config {
+  a2disconf *
+  rm /etc/apache2/conf-available/*
+  cp ./config/conf-available/*.conf /etc/apache2/conf-available
+  a2enconf *
+
+  # modules
+  apt install -y libapache2-mod-wsgi-py3
+  cp ./config/mods-available/alias.conf /etc/apache2/mods-available
+  a2enmod headers wsgi
+}
+
+function apache_site_enable() {
+  a2dissite *
+  cp ./config/sites-available/*.site /etc/apache2/sites-available
+  a2ensite "$1"
+}
+
+function install_source() {
+  [[ -d /var/www/TempSensor ]] && mv /var/www/TempSensor /var/www/TempSensor.bak
+  cp -r dist/* /var/www/TempSensor
+}
+
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
+case "$1" in
+  config)
+    stop
+    apache_server_config
+    start
+    ;;
+  install)
+    stop
+    install_source
+    start
+    ;;
+  static)
+    stop
+    apache_site_enable TempSensorStatic.site
+    start
+    ;;
+  dynamic)
+    stop
+    apache_site_enable TempSensorDynamic.site
+    start
+    ;;
+  *)
+    echo "Unknown argument:m config/install/static/dynamic"
+    ;;
+  esac
+
+
+
+
+
+
+
+
+
