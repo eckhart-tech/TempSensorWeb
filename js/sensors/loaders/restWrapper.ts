@@ -10,6 +10,9 @@ const baseURLS = ((obj) => Object.freeze(obj)) ({
     RANGE : '/range'
 });
 
+const DevRootURL: string = "http://127.0.0.1:8080";
+const LiveRootURL: string = "http://neptune.vm.tornadovps.net:8080";
+
 
 
 export class ASRESTApi {
@@ -19,7 +22,7 @@ export class ASRESTApi {
     url: string;
 
     constructor(
-        device = 'http://127.0.0.1:8080',
+        device = LiveRootURL, //'http://127.0.0.1:8080',
         days = 365.0,
         name = "") {
         this.device = device;
