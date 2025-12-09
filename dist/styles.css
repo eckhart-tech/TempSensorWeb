@@ -1,0 +1,245 @@
+/**
+ * Global Reset of all HTML Elements
+ *
+ * Resetting all of our HTML Elements ensures a smoother
+ * visual transition between browsers. If you don't believe me,
+ * try temporarily commenting out this block of code, then go
+ * and look at Mozilla versus Safari, both good browsers with
+ * a good implementation of CSS. The thing is, all browser CSS
+ * defaults are different and at the end of the day if visual
+ * consistency is what we're shooting for, then we need to
+ * make sure we're resetting all spacing elements.
+ *
+ */
+html,
+body {
+  border: 0;
+  font-family: "Helvetica-Neue", "Helvetica", Arial, sans-serif;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+div,
+span,
+object,
+iframe,
+img,
+table,
+caption,
+thead,
+tbody,
+tfoot,
+tr,
+tr,
+td,
+article,
+aside,
+canvas,
+details,
+figure,
+hgroup,
+menu,
+nav,
+footer,
+header,
+section,
+summary,
+mark,
+audio,
+video {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+address,
+cite,
+code,
+del,
+dfn,
+em,
+ins,
+q,
+samp,
+small,
+strong,
+sub,
+sup,
+b,
+i,
+hr,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+legend,
+label {
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  margin: 0;
+  padding: 0;
+}
+article,
+aside,
+canvas,
+figure,
+figure img,
+figcaption,
+hgroup,
+footer,
+header,
+nav,
+section,
+audio,
+video {
+  display: block;
+}
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+table caption,
+table th,
+table td {
+  text-align: left;
+  vertical-align: middle;
+}
+a img {
+  border: 0;
+}
+:focus {
+  outline: 0;
+}
+body {
+  background-color: white;
+  color: black;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  margin: 0;
+  justify-content: flex-start;
+}
+body header #beacons {
+  margin: 10px;
+}
+body header #beacons table {
+  border-collapse: collapse;
+  border-style: none;
+}
+body header #beacons table tr {
+  border-style: none;
+  background-color: burlywood;
+  color: black;
+}
+body header #beacons table tr td,
+body header #beacons table tr th {
+  padding: 4px;
+  margin: 4px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8em;
+  background-color: burlywood;
+  color: black;
+}
+body header #beacons table tr td {
+  border-width: 2px;
+  border-style: solid inset;
+  border-color: white burlywood;
+}
+body header #beacons table tr td.mac {
+  font-family: Courier, sans-serif;
+  font-size: 0.8em;
+}
+body header #beacons table tr td.l {
+  text-align: left;
+}
+body header #beacons table tr td.c {
+  text-align: center;
+}
+body header #beacons table tr td.r {
+  text-align: right;
+}
+body header #beacons table tr.active {
+  background-color: red;
+  border-color: white red;
+}
+body header #beacons table tr.active td {
+  background-color: red;
+  border-color: white red;
+}
+body header #controls {
+  margin: 10px;
+  display: inline-flex;
+  justify-content: space-between;
+  align-content: center;
+}
+body header #controls #dates {
+  margin: auto;
+}
+body header #controls #dates label {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 0.8em;
+  padding-right: 20px;
+}
+body header #controls #dates div {
+  display: flex;
+  justify-content: space-between;
+  align-content: baseline;
+}
+body header #controls #dates div * {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+body header #controls #data button {
+  width: 200px;
+  height: 100px;
+  border-radius: 16px;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1em;
+  background-color: greenyellow;
+  border-color: green;
+  color: black;
+  font-weight: bold;
+  margin: 10px 50px;
+}
+body main {
+  flex-grow: 1;
+}
+body main section#graph {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  margin: 0;
+  height: 100%;
+  flex: 1;
+}
+body main section#graph button {
+  padding: 4px;
+  margin: 1em;
+  border-radius: 4px;
+  border-style: none;
+  background: black;
+  color: white;
+}
+body main section#graph button:hover {
+  background: red;
+}
+body main section#graph figure {
+  max-height: 30vh;
+  padding: 1em;
+}
+/*# sourceMappingURL=styles.css.map */
