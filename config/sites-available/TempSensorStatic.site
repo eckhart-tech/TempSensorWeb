@@ -1,27 +1,16 @@
-<Macro DirPermissions $dir>
-  <Directory "$dir">
-    <IfVersion < 2.4>
-                Order allow,deny
-                Allow from all
-            </IfVersion>
-            <IfVersion >= 2.4>
-                Require all granted
-            </IfVersion>
-  </Directory>
-</Macro>
-
-# VHost for the site
-
-<VirtualHost: *:80>
-    ServerName site.com
-    ServerAlias site.com
-    ServerAdmin webmaster@site.com
+<VirtualHost *:80>
+    ServerName neptune.vm.tornadovps.net
+    ServerAlias neptune.vm.tornadovps.net
+    ServerAdmin webmaster@neptune.vm.tornadovps.net
 
     # static part
     DocumentRoot /var/www/TempSensor
     Alias /favicon.ico /var/www/TempSensor/favicon.ico
     Alias / /var/www/TempSensor/
-    Use DirPermissions /var/www/TempSensor
-</VirtualHost>
+    <Directory /var/www/TempSensor>
+        Require all granted
+    </Directory>
 
-UndefMacro DirPermissions
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
