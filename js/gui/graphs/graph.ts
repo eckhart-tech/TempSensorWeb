@@ -12,27 +12,70 @@ import { MakeGraphicConfigurations } from "./configuration";
 
 
 
+interface Size {
+  width: number;
+  height: number;
+}
+
 
 
 
 export class Graphic {
-  //static zoomer = new Zoomer();
+
+  canvas: HTMLCanvasElement
+
   static {
     //Chart.register(Graphic.zoomer);
     Chart.defaults.animation = false;
     Chart.defaults.plugins.legend.display = true;
     Chart.defaults.plugins.title.display = false;
   }
-  element: DOM;
+  root: DOM;
   charts: Chart[];
   alive: boolean;
+  
+  windows: ZoomWindow[];
 
   constructor(id: string) {
-    this.element = DOM.withID(id);
+    this.root = DOM.withID(id);
+    let canvas = new DOM('canvas');
+    this.root.append(canvas)
+    this.canvas=canvas.dom as HTMLCanvasElement;
+    this.windows=[];
+
     this.charts = [];
     this.alive = false;
 
   }
+
+  get context() { return this.canvas.getContext('2d'); }
+  get size() : Size { return { width: this.canvas.width, height: this.canvas.height} }
+
+  clear() {
+    let sz=this.size;
+    this.context.clearRect(0,0,sz.width,sz.height);
+  }
+
+  load() {
+    this.windows=[{start: 0, end: 100}]; //TODO : put in actual count of points in datasets
+  }
+
+  private zoomIn(start: number,end: number) {
+    this.windows.unshift({start:start,end:end});
+  }
+
+  private zoomOut() {
+    if (this.windows.length>1) {
+      this.windows.shift();
+    }
+  }
+
+  get window() : ZoomWindow {
+    if (this.windows.length>0) { return this.windows[0]; }
+    else { return {start:0,end:0}; }
+
+  }
+
 
   clean() {
     this.alive = false;
@@ -69,7 +112,7 @@ export class Graphic {
 
   async renderChart(c : GraphicConfiguration) {
     let canvas = new DOM("canvas").addClass(c.klass);
-    let chart = new Chart(canvas.dom as HTMLCanvasElement, c.configuration);
+    let chart = new Chart(canvas.dom as HTMLCanvasElement, c);
     this.charts.push(chart);
     let dom = new DOM("figure")
       .appendAll([
@@ -89,7 +132,7 @@ export class Graphic {
     this.element.append(reset.dom);
     // this.element.addEventListener('zoomer-event', e => this.globalHandler(e));
 
-    let configurations = MakeGraphicConfigurations('scatter',data,this.element);
+    let configurations = MakeGraphicConfigurations(data,this.element);
     console.log(configurations);
     for (const c of configurations) {
       await this.renderChart(c);

@@ -1,16 +1,38 @@
+
+
+WSGIPythonPath /usr/local/src
+WSGIRestrictStdout Off
+
 <VirtualHost *:80>
+
     ServerName neptune.vm.tornadovps.net
     ServerAlias neptune.vm.tornadovps.net
     ServerAdmin webmaster@neptune.vm.tornadovps.net
 
+    RewriteEngine On
+    RewriteRule "^/$" "/index.html" [L]
+
+    # dynamic part
+
+    WSGIScriptAlias /rest /usr/local/src/web/application.wsgi
+    WSGIDaemonProcess site.com processes=2 threads=15 display-name=%{GROUP}
+    WSGIProcessGroup site.com
+
+    <Directory /usr/local/src/web>
+        Require all granted
+    </Directory>
+
+
     # static part
     DocumentRoot /var/www/TempSensor
     Alias /favicon.ico /var/www/TempSensor/favicon.ico
-    Alias / /var/www/TempSensor/
+    AliasMatch "^/((.+)\.(css|js|html))$" "/var/www/TempSensor/$1"
     <Directory /var/www/TempSensor>
         Require all granted
     </Directory>
 
-    ErrorLog ${APACHE_LOG_DIR}/error.log
+    LogLevel info rewrite:trace1 wsgi:notice
+    ErrorLog /var/log/tmpsensot/error.log
     CustomLog ${APACHE_LOG_DIR}/access.log combined
+
 </VirtualHost>

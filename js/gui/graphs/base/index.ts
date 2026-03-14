@@ -1,13 +1,17 @@
 export {
-  RecordItem,
-  ToRecordItem,
-  Plugins,
   EventKey,
-  GraphicScale,
-  makeGraphicScale
+  GraphicEvent
 } from './configurations';
 export {
-  GraphicOptions,
-  ChartConfig,
-  GraphicConfiguration
-} from './chart';
+  GraphicScaleTickLabeller,
+  GraphicAxis,
+  AxisScaler
+} from './axes';
+export {
+  Point,
+  clip
+} from './geometry';
+export {
+  PlotData,
+  PlotDataSet
+} from './data';

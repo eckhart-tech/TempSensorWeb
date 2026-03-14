@@ -1,60 +1,33 @@
-import {
-  Chart,
-  ChartData,
-  ChartDataset,
-  ChartEvent,
-  ChartType,
-  ChartTypeRegistry,
-  LegendElement,
-  LegendItem,
-  PluginOptionsByType,
-  Point,
-  Tick,
-} from "chart.js";
+
+import { Graphic } from "../graph";
+
 
 export type EventKey = keyof HTMLElementEventMap;
 
-export interface RecordItem {
-  label: string;
-  data: Point[];
-}
+export class GraphicEvent extends Event {
+  base: Graphic;
+  canvas: HTMLCanvasElement;
+  x : number;
+  y : number;
+  readonly raw : Event|null;
 
-export function ToRecordItem(s: ChartDataset<ChartType, Point[]>): RecordItem {
-  return {
-    label: s.label,
-    data: s.data,
-  };
-}
-
-
-
-
-export interface Plugins  {
-  [index: string]: any;
-}
-
-
-
-
-export type GraphicScaleTicks = (value : number, index : number , ticks : Tick[]) => string;
-export interface GraphicScale {
-  beginAtZero?: boolean,
-  min?: number,
-  max?: number,
-  ticks: {
-    callback: GraphicScaleTicks,
-    color? : string
+  constructor(name='GraphicEvent', base: Graphic, x: number, y: number, raw : Event|null) {
+    super(name);
+    this.base=base;
+    this.canvas=base.canvas;
+    this.x=x;
+    this.y=y;
+    this.raw=raw;
   }
 }
 
-export function makeGraphicScale(ticks: GraphicScaleTicks,beginAtZero: boolean = false) : GraphicScale {
-  return {
-    beginAtZero: beginAtZero,
-    ticks: {
-      callback: ticks
-    }
-  };
-}
+
+
+
+
+
+
+
 
 
 

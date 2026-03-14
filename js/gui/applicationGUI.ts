@@ -19,7 +19,27 @@ import { GraphDataSet } from "./graphs/graphData";
 import { DOM, DOMButton } from "./dom";
 
 
+class TableButtons {
+  private buttons : DOM[];
 
+  constructor(table: BeaconTable) {
+    let b1 = new DOMButton('Select all', 'select_all');
+    let b2 = new DOMButton("Clear all", "clear_all");
+    let b3 = new DOMButton("Select known", "select_known");
+    let b4 = new DOMButton("Clear unknown", "clear_unknown");
+
+    b1.addListener((_) => table.setAll());
+    b2.addListener((_) => table.clearAll());
+    b3.addListener((_) => table.selectKnown());
+    b4.addListener((_) => table.clearUknown());
+
+    this.buttons = [b1,b2,b3,b4].map(b => b.dom);
+  }
+
+  render(root: DOM) {
+    root.append(new DOM('nav').appendAll(this.buttons));
+  }
+}
 
 
 const SHOW_TABLE = false;

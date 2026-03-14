@@ -2,3 +2,4 @@ export { Format, Convert, convert, isNull, isValid, safeParseInt } from './forma
 export { ESSet } from './XSet';
 export { InitListDict } from './InitListDict';
 export { Downloader } from './file';
+export { Stack } from './stack';

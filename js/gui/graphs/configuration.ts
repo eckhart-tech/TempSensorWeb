@@ -1,67 +1,53 @@
-import { ChartType } from "chart.js";
-import { GraphDataSet, Parameter } from "./graphData";
+
+import { GraphDataSet } from "./graphData";
+import { Parameter, Parameters } from "./parameters";
 import { Format } from "../../lib";
 
-//import { zoomerOptions } from "./zoomer";
+
 import { DOM } from "../dom";
-import {
-  ChartConfig,
-  GraphicConfiguration,
-  GraphicOptions,
-  Plugins,
-  EventKey,
-  makeGraphicScale
-} from "./base";
+import { GraphicAxis, PlotDataSet } from "./base";
 
 
 
-function MakeGraphicOptions(
-  parameter:Parameter,
-  events : EventKey[],
-  plugins: Plugins
-) : GraphicOptions {
-  return {
-    scales: {
-      x: makeGraphicScale(function(value, index, ticks) {
-          return Format.date(value);
-        }
-      ),
-      y: makeGraphicScale(function(value, index, ticks) {
-          return `${value}${parameter.units}`;
-        }
-      )
-    },
-    events: events,
-    plugins: plugins
-  };
+export class GraphicConfiguration {
+  parameter: Parameter;
+  title: string;
+  klass: string;
+  data: PlotDataSet;
+  xAxis: GraphicAxis;
+  yAxis: GraphicAxis;
+
+
+
+  constructor(
+    parameter:Parameter,
+  ) {
+    this.parameter=parameter;
+    this.klass = parameter.toString();
+    this.xAxis = new GraphicAxis("date", function (value, index) {
+      return Format.date(value);
+    });
+    this.yAxis = new GraphicAxis(parameter.toString(), function (value, index) {
+      return `${value}${parameter.units}`;
+    });
+
+  }
+
+  load(data: GraphDataSet) {
+    let beacons = data.beacons.join(", ");
+    this.title = `${this.parameter} for ${beacons} (${this.parameter.units})`;
+    this.data = data.dataSet(this.parameter);
+
+  }
+
+
+
 }
 
-function MakeGraphicConfiguration(
-  type: ChartType,
-  data: GraphDataSet,
-  parameter:Parameter,
-  plugins: Plugins = {}
-): GraphicConfiguration {
-    let datasets = data.dataSet(parameter);
-    let beacons = data.beacons.join(', ');
-
-    let configuration : ChartConfig = {
-      type: type,
-      data: {
-        datasets: datasets
-      },
-      options : MakeGraphicOptions(parameter,[],plugins)
-    };
-    return {
-      configuration: configuration,
-      title: `${parameter} for ${beacons} (${parameter.units})`,
-      klass: parameter.toString()
-  };
-}
-
-export function  MakeGraphicConfigurations(type: ChartType,data: GraphDataSet,element: DOM|null=null) : GraphicConfiguration[] {
-  /*let plugins = {
-    zoomer: zoomerOptions(element)
-  }; */
-  return Parameter.All.map(p => MakeGraphicConfiguration(type,data,p));
+export function  MakeGraphicConfigurations(data: GraphDataSet) : GraphicConfiguration[] {
+  return Parameters.All.map(p => {
+    let gc = new GraphicConfiguration(p);
+    gc.load(data);
+    return gc;
+  });
 }

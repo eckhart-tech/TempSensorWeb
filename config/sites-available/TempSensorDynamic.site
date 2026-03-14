@@ -1,35 +1,37 @@
-# Macro for standard directory permissions
 
-<Macro DirPermissions $dir>
-  <Directory "$dir">
-    <IfVersion < 2.4>
-                Order allow,deny
-                Allow from all
-            </IfVersion>
-            <IfVersion >= 2.4>
-                Require all granted
-            </IfVersion>
-  </Directory>
-</Macro>
+LogLevel info
+#WSGIPythonPath /usr/local/src
+#WSGIRestrictStdout Off
 
-# VHost for the site
-
-<VirtualHost: *:80>
-    ServerName site.com
-    ServerAlias site.com
-    ServerAdmin webmaster@site.com
+<VirtualHost *:80>
+    ServerName neptune.vm.tornadovps.net
+    ServerAlias neptune.vm.tornadovps.net
+    ServerAdmin webmaster@neptune.vm.tornadovps.net
 
     # static part
     DocumentRoot /var/www/TempSensor
     Alias /favicon.ico /var/www/TempSensor/favicon.ico
-    Alias / /var/www/TempSensor/
-    Use DirPermissions /var/www/TempSensor
+    Alias /temp/ /var/www/TempSensor/
+    <Directory /var/www/TempSensor>
+        Require all granted
+    </Directory>
 
     # dynamic part
-    WSGIDaemonProcess site.com processes=2 threads=15 display-name=%{GROUP}
-    WSGIScriptAlias /data/ /opt/TempSensor/app.wsgi process-group=site.com
-    WSGIProcessGroup site.com
-    Use DirPermissions /opt/TempSensor
-</VirtualHost>
 
-UndefMacro DirPermissions
+    WSGIDaemonProcess site.com processes=1 threads=15 display-name=%{GROUP} python-path=/usr/local/src
+    WSGIProcessGroup site.com
+    WSGIScriptAlias /rest /usr/local/src/web/application.wsgi
+
+    <Directory /usr/local/src/web>
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+    RewriteEngine on
+    RewriteMap    hosts-deny  "txt:/etc/apache2/blacklist"
+    RewriteCond   "${hosts-deny:%{REMOTE_ADDR}|NOT-FOUND}" "!=NOT-FOUND" [OR]
+    RewriteCond   "${hosts-deny:%{REMOTE_HOST}|NOT-FOUND}" "!=NOT-FOUND"
+    RewriteRule .* - [F]
+</VirtualHost>
