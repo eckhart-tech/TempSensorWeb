@@ -17,6 +17,7 @@ import { ESSet, Downloader } from "../lib";
 import { Graphic } from "./graphs";
 import { GraphDataSet } from "./graphs/graphData";
 import { DOM, DOMButton } from "./dom";
+import { DateRangeEvent, TimeRangeControl } from "./lists/TimeRangeDisplay";
 
 
 
@@ -31,9 +32,13 @@ export class ApplicationGUI {
   private beaconTable : BeaconTable;
   private recordTable : RecordTable | null;
   private rangeTable : TimeRangeDisplay;
+  private rangeControls : TimeRangeControl;
   graphic : Graphic | null;
   controls: DOMButton;
   timeRange : TimeRanges;
+
+
+  private daysToDisplay: number = 30;
 
   constructor() {
     this.records = new Records();
@@ -42,6 +47,7 @@ export class ApplicationGUI {
 
     this.controls = new DOMButton('Download CSV','download');
     this.rangeTable = new TimeRangeDisplay('dates');
+    this.rangeControls = new TimeRangeControl('ranges');
     this.beaconTable = new BeaconTable('beacons','Beacons','bcn-known');
     if(SHOW_TABLE) { this.recordTable = new RecordTable('records'); }
   }
@@ -52,14 +58,12 @@ export class ApplicationGUI {
    */
   async callback(event: BeaconEvent) {
     console.log(event);
+    await this.reload();
+  }
 
-    let filter = new ESSet(this.beaconTable.active.map(b => b.name));
-    if(SHOW_TABLE) {
-      console.log('Payload is', filter, 'Table is', this.recordTable);
-      this.recordTable?.filter(filter);
-    }
-    let temps = new GraphDataSet(this.records,[...filter]);
-    await this.graphic.render(temps);
+  async adjust(event: DateRangeEvent) {
+    this.daysToDisplay=event.nDays;
+    await this.reload();
   }
 
   async download() {
@@ -71,6 +75,15 @@ export class ApplicationGUI {
     console.log('Callback for downloading CSV');
   }
 
+  async reload() {
+    let temps = new GraphDataSet(
+      this.records,
+      this.beaconTable.active,
+      this.daysToDisplay,
+    );
+    await this.graphic.render(temps);
+  }
+
   async load() {
     this.timeRange = await rangeLoader();
     this.records = await recordLoader();
@@ -78,8 +91,10 @@ export class ApplicationGUI {
 
     console.log(this.timeRange.toString(),this.timeRange.items[0].dates, this.timeRange.items[0].timestamps);
     this.rangeTable.render(this.timeRange);
+    this.rangeControls.render();
 
     this.extraBeacons = new ExtraBeacons(this.records,this.beacons);
+
     console.log('Extra',this.extraBeacons);
     let c = this.records.counts;
     this.beacons.setCounts(c);
@@ -95,6 +110,8 @@ export class ApplicationGUI {
     this.graphic = new Graphic('graph');
 
     document.addEventListener("beacon-list", e => this.callback(e));
-    await this.callback(new BeaconEvent());
+    document.addEventListener("date-range", e => this.adjust(e as DateRangeEvent));
+    this.rangeControls.fire();
+    //await this.reload();
   }
 }

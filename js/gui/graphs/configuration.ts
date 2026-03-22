@@ -1,5 +1,6 @@
 import { ChartType } from "chart.js";
-import { GraphDataSet, Parameter } from "./graphData";
+import { GraphDataSet } from "./graphData";
+import { Parameter } from "./graphParameter";
 import { Format } from "../../lib";
 
 //import { zoomerOptions } from "./zoomer";
@@ -43,7 +44,7 @@ function MakeGraphicConfiguration(
   plugins: Plugins = {}
 ): GraphicConfiguration {
     let datasets = data.dataSet(parameter);
-    let beacons = data.beacons.join(', ');
+    let beacons = data.beacons.map( b => b.beacon).join(', ');
 
     let configuration : ChartConfig = {
       type: type,
@@ -59,9 +60,7 @@ function MakeGraphicConfiguration(
   };
 }
 
+
 export function  MakeGraphicConfigurations(type: ChartType,data: GraphDataSet,element: DOM|null=null) : GraphicConfiguration[] {
-  /*let plugins = {
-    zoomer: zoomerOptions(element)
-  }; */
   return Parameter.All.map(p => MakeGraphicConfiguration(type,data,p));
 }

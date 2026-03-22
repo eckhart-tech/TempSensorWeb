@@ -1,13 +1,15 @@
 import { DOM } from "../dom";
-import { BaseRecord, Beacon } from "../../sensors";
+import { BaseRecord, BaseRecordSet, Beacon } from "../../sensors";
 import {Table} from './base';
-import {BeaconEvent} from "./events";
+import {BeaconEvent, IndexedBeacon} from "./events";
 import { isValid, safeParseInt } from "../../lib";
 
 
 
 
 export const BeaconHeaders : string[] = ['Beacon Name','MAC Address','Is known?','N Records'];
+
+
 
 export class BeaconTable extends Table {
   tag: string;
@@ -58,8 +60,10 @@ export class BeaconTable extends Table {
     }
   }
 
-  get active() {
+  get active(): IndexedBeacon[] {
     let ind: number[] = this.table.activeIndices;
-    return ind.map((idx) => this.rows[idx]);
+    return ind.map((idx) => {
+      return { beacon: this.rows[idx].name, index: idx };
+    });
   }
 }

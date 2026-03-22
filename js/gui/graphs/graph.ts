@@ -1,7 +1,4 @@
 import { Chart, ChartItem } from "chart.js/auto";
-//import { Chart, ScatterController, PointElement, LinearScale, Colors, Legend, Title } from "chart.js";
-//import zoomPlugin from 'chartjs-plugin-zoom';
-//import { Zoomer } from "./zoomer";
 
 
 import { DOM, DOMButton } from "../dom";
@@ -18,7 +15,6 @@ import { MakeGraphicConfigurations } from "./configuration";
 export class Graphic {
   //static zoomer = new Zoomer();
   static {
-    //Chart.register(Graphic.zoomer);
     Chart.defaults.animation = false;
     Chart.defaults.plugins.legend.display = true;
     Chart.defaults.plugins.title.display = false;

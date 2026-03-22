@@ -1,81 +1,74 @@
-import { Record, Records } from "../../sensors";
+import { Beacon, Record, Records } from "../../sensors";
 import { RecordItem } from "./base";
 import { Point } from "chart.js";
-
-enum _Parameter {
-  Temperature = "temperature",
-  Humidity = "humidity",
-  Battery = "battery",
-}
-
-export class Parameter {
-  readonly parameter: _Parameter;
-  readonly units: string;
-  readonly min: number;
-  readonly max: number;
-
-  constructor(parameter: _Parameter) {
-    this.parameter = parameter;
-
-    switch (parameter) {
-      case _Parameter.Temperature:
-        this.units = "C";
-        break;
-      case _Parameter.Battery:
-      case _Parameter.Humidity:
-        this.units = "%";
-        break;
-      default:
-        this.units = "";
-        break;
-    }
-
-    this.min = 0;
-    this.max = 100;
-  }
-
-  toString(): string {
-    return this.parameter;
-  }
-
-  static Temperature = new Parameter(_Parameter.Temperature);
-  static Humidity = new Parameter(_Parameter.Humidity);
-  static Battery = new Parameter(_Parameter.Battery);
-
-  static All = [Parameter.Temperature, Parameter.Humidity, Parameter.Battery];
-}
-
-function getParameter(record: Record, parameter: Parameter): number {
-  return record[parameter.parameter];
-}
+import { IndexedBeacon } from "../lists";
+import { Parameter} from './graphParameter';
 
 interface DataForBeacon {
   beacon: string;
+  index: number;
   records: Record[];
 }
 
+class ColourSet {
+  private readonly colours: string[];
+
+  constructor(...colours: string[]) {
+    this.colours = colours;
+  }
+
+  get length() : number { return this.colours.length; }
+  colour(idx : number) : string { return this.colours[idx%this.length]; }
+}
+
+ const Spectral10 = new ColourSet(
+  "#9e0142",
+  "#d53e4f",
+  "#f46d43",
+  "#fdae61",
+  "#fee08b",
+  "#e6f598",
+  "#abdda4",
+  "#66c2a5",
+  "#3288bd",
+  "#5e4fa2");
+
 export class GraphDataSet {
-  beacons: string[];
+  beacons: IndexedBeacon[];
   private records: DataForBeacon[];
   min: Date;
+  minTime: number;
   max: Date;
 
-  /**
-   *
-   * @param {Records} records
-   * @param {[string]|null} beacons
-   */
-  constructor(records: Records, beacons: string[] | null = null) {
-    this.beacons = beacons === null ? records.keys : beacons;
+  static millisecondsPerDay = 86400000;
+
+
+
+  constructor(records: Records, beacons: IndexedBeacon[] | null = null,nDays : number | null) {
+    this.beacons =
+      beacons === null
+        ? records.keys.map((n, id) => {
+            return { beacon: n, index: id };
+          })
+        : beacons;
     this.records = this.beacons.map((b) => {
-      let recs = records.filter(b);
+      let recs = records.filter(b.beacon);
       return {
-        beacon: b,
+        beacon: b.beacon,
+        index: b.index,
         records: recs,
       };
     });
-    this.min = records.min;
+
+    this.min=records.min;
     this.max = records.max;
+
+    if (nDays === null) {
+      this.minTime = this.min.getTime();
+    } else {
+      let min = records.max.getTime() - GraphDataSet.millisecondsPerDay * nDays;
+      this.minTime = Math.max(records.min.getTime(), min);
+    }
   }
 
   dataSet(parameter: Parameter): RecordItem[] {
@@ -85,10 +78,13 @@ export class GraphDataSet {
           x: r.timestamp.getTime(),
           y: r[parameter.parameter] as number,
         };
-      });
+      }).filter(r => r.x>=this.minTime);
+      let colour = Spectral10.colour(d.index);
       return {
         label: d.beacon,
         data: values,
+        backgroundColor: colour,
+        borderColor: colour,
       };
     });
   }

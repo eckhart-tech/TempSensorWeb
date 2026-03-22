@@ -23,6 +23,7 @@ export class Beacons extends BaseRecordSet {
 }
 
 
+
 export class ExtraBeacons extends BaseRecordSet {
   extraBeacons : Beacon[];
 

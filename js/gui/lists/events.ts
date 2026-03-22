@@ -4,21 +4,26 @@ import {Beacon} from "../../sensors";
  * @extends Event
  */
 
+export interface IndexedBeacon {
+  beacon: string;
+  index: number;
+}
+
 export interface BeaconEventData {
   active: string[];
   isAll : boolean;
 }
 
 export class BeaconEvent extends Event {
-    readonly activeBeacons: Set<string>;
+    readonly activeBeacons: Array<IndexedBeacon>;
 
-    constructor(active: Beacon[] = []) {
+    constructor(active: IndexedBeacon[] = []) {
         super('beacon-list', {bubbles: true});
-        this.activeBeacons = new Set(active.map(b => b.name));
+        this.activeBeacons = active;
     }
 
     get displayAll() : boolean {
-      return this.activeBeacons.size===0;
+      return this.activeBeacons.length===0;
     }
 }
 
