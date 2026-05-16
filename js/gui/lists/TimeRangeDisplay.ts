@@ -72,7 +72,7 @@ export class TimeRangeControl extends GUIBase {
   callback(event: Event) {
       let target = event.target as Element;
       if (target != null) {
-        let name=target.getAttribute("name") ?? '365000';
+        let name=target.getAttribute("button") ?? "365000";
         this.buttons.forEach(b => {
           if(b.name===name) {
             b.dom.addClass('clicked');
@@ -91,8 +91,8 @@ export class TimeRangeControl extends GUIBase {
     this.base.empty();
     this.buttons = this.delays.map((d) => new DOMButton(d.name, d.value.toString()));
 
-    this.buttons.forEach((b) => b.addListener(this.callback));
-    this.base.append(new DOM("nav").appendAll(this.buttons.map(d => d.dom)));
+    this.buttons.forEach((b) => b.addListener(e => this.callback(e)));
+    this.base.appendAll(this.buttons.map(d => d.dom));
 
   }
 

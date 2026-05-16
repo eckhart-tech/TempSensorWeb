@@ -13,6 +13,9 @@ export class DOMButton extends DOMElement {
     this.event = "click";
   }
 
+  get nameAttribute() { return this.dom.getAttr("button"); }
+
+
   click() {
     this.dom.click();
   }

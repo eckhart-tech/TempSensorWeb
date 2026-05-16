@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 
 function stop {
-  systemctl apache2 stop
+  systemctl stop apache2
 }
 
 function start {
-  systemctl apache2 start
+  systemctl start apache2
 }
 
 function apache_server_config {
-  a2disconf *
+  cd /etc/apache2/conf-available
+  a2disconf /etc/apache2/conf-available/*
   rm /etc/apache2/conf-available/*
   cp ./config/conf-available/*.conf /etc/apache2/conf-available
   a2enconf *

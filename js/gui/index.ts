@@ -1,1 +1,1 @@
-export { ApplicationGUI } from './applicationGUI';
+export { ApplicationGUI, Notifications } from './applicationGUI';

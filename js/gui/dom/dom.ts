@@ -234,6 +234,16 @@ export class DOM {
     return this;
   }
 
+  removeAllClasses() : DOM {
+    while(this.element.classList.length>0) {
+      let klass = this.element.classList.item(0);
+      if(klass !== null) {
+        this.element.classList.remove(klass);
+      }
+    }
+    return this;
+  }
+
   /**
    *
    * @param {string} klass

@@ -11,7 +11,7 @@ const baseURLS = ((obj) => Object.freeze(obj)) ({
 });
 
 const DevRootURL: string = "http://127.0.0.1:8080";
-const LiveRootURL: string = "http://neptune.vm.tornadovps.net/rest";
+const LiveRootURL: string = "http://environment.allsaintschelt.info/rest";
 
 
 

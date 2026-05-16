@@ -13,14 +13,29 @@ import {
   CSVData
 } from "../sensors";
 import { BeaconEvent, BeaconTable, RecordHeaders, RecordTable, TimeRangeDisplay } from "./lists";
-import { ESSet, Downloader } from "../lib";
+import { Downloader } from "../lib";
 import { Graphic } from "./graphs";
 import { GraphDataSet } from "./graphs/graphData";
 import { DOM, DOMButton } from "./dom";
 import { DateRangeEvent, TimeRangeControl } from "./lists/TimeRangeDisplay";
 
 
+export class Notifications {
+  static base : DOM;
+  static {
+    this.base = DOM.withID('notifications');
+  }
 
+  static reset() {
+    this.base.empty();
+  }
+
+  static load(tag : string, lines : string[]) {
+    this.reset();
+    let paragraphs = lines.map(text => new DOM('p').text(text));
+    this.base.append(new DOM('div').addClass(tag).appendAll(paragraphs));
+  }
+}
 
 
 const SHOW_TABLE = false;
@@ -85,6 +100,8 @@ export class ApplicationGUI {
   }
 
   async load() {
+    Notifications.load('waiting',['Loading...'])
+
     this.timeRange = await rangeLoader();
     this.records = await recordLoader();
     this.beacons = await beaconLoader();
@@ -100,6 +117,7 @@ export class ApplicationGUI {
     this.beacons.setCounts(c);
     this.extraBeacons.setCounts(c);
 
+    Notifications.reset();
 
     this.beaconTable.render(this.beacons,this.extraBeacons);
     if(SHOW_TABLE) { this.recordTable.render(this.records); }
@@ -112,6 +130,7 @@ export class ApplicationGUI {
     document.addEventListener("beacon-list", e => this.callback(e));
     document.addEventListener("date-range", e => this.adjust(e as DateRangeEvent));
     this.rangeControls.fire();
-    //await this.reload();
+
+
   }
 }

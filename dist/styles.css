@@ -183,6 +183,7 @@ body header #beacons table tr.active td {
 body header #controls {
   margin: 10px;
   display: inline-flex;
+  flex-direction: column;
   justify-content: space-between;
   align-content: center;
 }
@@ -202,6 +203,22 @@ body header #controls #dates div {
 body header #controls #dates div * {
   margin-top: auto;
   margin-bottom: auto;
+}
+body header #controls #ranges {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin: auto;
+}
+body header #controls #ranges button {
+  flex: 1;
+  text-align: center;
+  margin: 2px;
+}
+body header #controls #ranges button.clicked {
+  background: burlywood;
 }
 body header #controls #data button {
   width: 200px;
@@ -241,5 +258,18 @@ body main section#graph button:hover {
 body main section#graph figure {
   max-height: 30vh;
   padding: 1em;
+}
+body main section#notifications div {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+body main section#notifications div.error {
+  border: 2px solid red;
 }
 /*# sourceMappingURL=styles.css.map */
