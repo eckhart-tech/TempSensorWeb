@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig host="neptune.vm.tornadovps.net" id="82331247-8d76-4734-8d19-a4cc4aac761c" keyPath="$USER_HOME$/.ssh/id_neptune" port="22" nameFormat="DESCRIPTIVE" username="julianporter" useOpenSSHConfig="true" />
+    </configs>
+  </component>
+</project>

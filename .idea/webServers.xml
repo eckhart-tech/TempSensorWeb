@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="49321333-b9c6-4d15-b6b9-2fb1630f9cb5" name="neptune.vm.tornadovps.net" url="https://environment.allsaintschelt.info">
+        <fileTransfer rootFolder="/var/www/TempSensor" accessType="SFTP" host="neptune.vm.tornadovps.net" port="22" sshConfigId="82331247-8d76-4734-8d19-a4cc4aac761c" sshConfig="julianporter@neptune.vm.tornadovps.net:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

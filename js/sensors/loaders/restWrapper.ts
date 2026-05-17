@@ -10,8 +10,8 @@ const baseURLS = ((obj) => Object.freeze(obj)) ({
     RANGE : '/range'
 });
 
-const DevRootURL: string = "http://127.0.0.1:8080";
-const LiveRootURL: string = "http://environment.allsaintschelt.info/rest";
+//const DevRootURL: string = "http://127.0.0.1:8080";
+const LiveRootURL: string = "https://environment.allsaintschelt.info/rest";
 
 
 
